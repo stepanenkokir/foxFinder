@@ -19,18 +19,6 @@ const util = require('gulp-util');
 
 const nodemon = require('gulp-nodemon');
 
-// Подключаем Browsersync
-// const browserSync = require('browser-sync').create();
-
-// // Определяем логику работы Browsersync
-// function browsersync() {
-// 	browserSync.init({ // Инициализация Browsersync
-// 		server: { baseDir: 'bin/client/' }, // Указываем папку сервера
-// 		notify: false, // Отключаем уведомления
-// 		online: true // Режим работы: true или false
-// 	})
-// }
-
 
 function cleandist() {
 	return del('bin/**/*', { force: true });
@@ -55,7 +43,7 @@ function scriptClient() {
 }
 
 function moveClient(){	
-     return src(['src/client/**/*', '!client/js/*.js'])
+     return src(['src/client/**/*', '!src/client/js/*.js'])
     .pipe(dest('./bin/client/'));
 }
 

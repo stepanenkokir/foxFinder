@@ -34,29 +34,28 @@ var sessionMiddleware = session({
 });
 
 app.use(cookieParser('secret'));
-
 io.use(function(socket, next){  
-
   sessionMiddleware(socket.request, socket.request.res, next);  
-  //var address = socket.request.connection.remoteAddress;
-  //sessID = socket.request.session;
 });
 
 app.use(sessionMiddleware);
-
-//app.use('/src', express.static(__dirname + '/src/client'));
 app.use(express.static(__dirname + '/../client'));
 
-/*
-app.get('/', (req, res) => {
-   
-    let rS = req.session;
-    res.cookie('token', rS.id);
-    console.log('send Start page! '+__dirname + '/../client/index.html');
-    res.sendFile(__dirname + '/../client/index.html');
+// app.use(function (req, res, next) {
+//   // console.log('Time:'+ Date.now()+  " req = "+req);
+//   // next();
+//   //res.send();
+//   res.sendStatus(404);
+// });
+
+app.get('/', function (req, res) {
+  // Cookies that have not been signed
+  console.log('Cookies: ', req.cookies);
+ 
+  // Cookies that have been signed
+  console.log('Signed Cookies: ', req.signedCookies);
 });
 
-*/
 io.on('connection', (socket) => {
    
     sessID = socket.request.session.id;
@@ -64,7 +63,7 @@ io.on('connection', (socket) => {
 
     if (sessID in players)  
     {
-        console.log(" old sock = "+players[sessID].sock+" new sock = "+socket.id+" in sess"+sessID);
+       // console.log(" old sock = "+players[sessID].sock+" new sock = "+socket.id+" in sess"+sessID);
         players[sessID].sock = socket.id;       
 
     } 
@@ -74,14 +73,20 @@ io.on('connection', (socket) => {
         if (sessID in players)
         {
            // players[sessID].name=nName;
-            console.log("OLD PLAYER in game again "+sessID); 
+           // console.log("OLD PLAYER in game again "+sessID); 
 
             if (players[sessID].isLogin)
-                socket.emit("contGame");
+            {
+                var serverData={};
+                serverData.name = players[sessID].name;
+                serverData.time = Date.now() - players[sessID].startTime;
+                socket.emit("contGame",serverData);
+            }
             else
-                socket.emit("newPlayer",authorized.authorizedForm());
+                socket.emit("newPlayer");
             return;   
         }
+
 
         console.log("add new Player "+sessID); 
         players[sessID] ={                      
@@ -93,20 +98,23 @@ io.on('connection', (socket) => {
         socket.emit("newPlayer");
         
 
-        countOfPlayer = 0;
-        for(var id in players)
-          countOfPlayer++;
+        // countOfPlayer = 0;
+        // for(var id in players)
+        //   countOfPlayer++;
 
-        console.log("Now count of Player =  "+countOfPlayer);        
+        // console.log("Now count of Player =  "+countOfPlayer);        
       });
     
     socket.on('startGame', function(nName){
         sessID = socket.request.session.id;
         players[sessID].name=nName;
         players[sessID].isLogin=true;
-
+        players[sessID].startTime=Date.now();
+        var serverData={};
+        serverData.name = nName;
+        serverData.time = -5;
         console.log("Start game for "+nName +" from "+sessID);
-        socket.emit("contGame",nName);      
+        socket.emit("contGame",serverData);      
     });
 });
 
