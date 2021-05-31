@@ -105,7 +105,7 @@ io.on('connection', (socket) => {
         // console.log("Now count of Player =  "+countOfPlayer);        
       });
     
-    socket.on('startGame', function(nName){
+    socket.on('auth', function(nName){
         sessID = socket.request.session.id;
         players[sessID].name=nName;
         players[sessID].isLogin=true;
@@ -113,9 +113,22 @@ io.on('connection', (socket) => {
         var serverData={};
         serverData.name = nName;
         serverData.time = -5;
-        console.log("Start game for "+nName +" from "+sessID);
+        
         socket.emit("contGame",serverData);      
     });
+
+    socket.on('startGame', function(){
+        sessID = socket.request.session.id;
+        players[sessID].started = true;
+        console.log("Start game for "+ players[sessID].name +" from "+sessID);       
+    });
+
+
+    socket.on('windowResized', function (data) {
+        currentPlayer.screenWidth = data.screenWidth;
+        currentPlayer.screenHeight = data.screenHeight;
+    });
+
 });
 
 http.listen(PORT, () => {

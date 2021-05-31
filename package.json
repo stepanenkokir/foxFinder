@@ -32,7 +32,7 @@
         "gulp-todo": "^7.1.1",
         "gulp-uglify": "^3.0.2",
         "gulp-util": "^3.0.8",
-        "http": "^0.0.1-security",
+        "http": "^0.0.1-security",        
         "redis": "^3.1.2",
         "socket.io": "^4.1.2",
         "socket.io-client": "^4.1.2",

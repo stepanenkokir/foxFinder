@@ -23,6 +23,7 @@ canvas {
     background-color: black;
     width: 100%;
     height: 100%;
+  
 }
 
 meta {
@@ -67,7 +68,7 @@ div{
 
 #miniMap{	
 	position: absolute;
-	left:1px;
+	right:1px;
 	bottom: 1px;
 	border: solid 2px #dcdc00; 
 	height: 15vw;
@@ -93,4 +94,48 @@ div{
 
 .w100{
 	width:100%;
+}
+
+.transition {
+  position: relative;
+  z-index: 2; 
+  color: #FFF;
+  margin: 0 auto;
+  padding: 10px;
+  text-align: center;
+  max-width: 500px;
+  font-size: 40px;
+}
+
+.transition-scale {
+ 
+  display: table-cell;
+  z-index: 2; 
+  color: #FFF;
+  margin: 0 auto;
+  padding: 10px;
+  text-align: center;
+  max-width: 500px;
+  font-size: 40px;
+  
+
+  animation-duration: 1.05s;
+  animation-name: slidein;
+}
+
+
+@keyframes slidein {
+  from {
+    -webkit-transform: scale(0);
+  	transform: scale(0);
+  	opacity: 1;
+  }
+
+  to {
+   	-webkit-transform: scale(4);
+   	transform: scale(4);
+   	opacity: 0;
+  }
+
+  
 }
