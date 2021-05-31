@@ -1,5 +1,5 @@
 var Canvas = require('./canvas');
-var Global = require('./global');
+var global = require('./global');
 var System = require('./system');
 
 var io = require('socket.io-client');
@@ -50,7 +50,7 @@ socket.on("contGame", function(serverData) {
     global.playerName = serverData.name;
     System.writeCookie('name',serverData.name,12);
 	if (serverData.time<5)
-    	countDown(1);
+    	countDown(5);
     else
     	socket.emit('startGame');
 });
@@ -181,13 +181,14 @@ function gameLoop() {
 
 function drawgrid() {
 
-	System.debug("show grid!");
+	System.debug("show grid! ="+ global.xoffset+" : "+ global.screenWidth+" || "+global.yoffset+ " | "+player.x+":"+player.y);
      graph.lineWidth = 1;
      graph.strokeStyle = global.lineColor;
-     graph.globalAlpha = 0.05;
+     graph.globalAlpha = 1;
      graph.beginPath();
 
     for (var x = global.xoffset - player.x; x < global.screenWidth; x += global.screenHeight / 20) {
+        console.log("x = "+x);
         graph.moveTo(x, 0);
         graph.lineTo(x, global.screenHeight);
     }

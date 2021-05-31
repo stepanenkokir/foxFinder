@@ -106,6 +106,7 @@ io.on('connection', (socket) => {
       });
     
     socket.on('auth', function(nName){
+      //  console.log("Auth = "+nName);
         sessID = socket.request.session.id;
         players[sessID].name=nName;
         players[sessID].isLogin=true;
@@ -125,8 +126,8 @@ io.on('connection', (socket) => {
 
 
     socket.on('windowResized', function (data) {
-        currentPlayer.screenWidth = data.screenWidth;
-        currentPlayer.screenHeight = data.screenHeight;
+       // currentPlayer.screenWidth = data.screenWidth;
+       // currentPlayer.screenHeight = data.screenHeight;
     });
 
 });
