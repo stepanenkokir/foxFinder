@@ -1,0 +1,37 @@
+module.exports = {
+    // Keys and other mathematical constants
+    KEY_ESC: 27,
+    KEY_ENTER: 13,            
+    KEY_LEFT: 65,
+    KEY_UP: 87,
+    KEY_RIGHT: 68,
+    KEY_DOWN: 83,
+    KEY_SHIFT: 16,
+    borderDraw: true,
+    onShowPeleng:true,
+    onShowPlayers:true,    
+    
+    // Canvas
+    screenWidth: window.innerWidth,
+    screenHeight: window.innerHeight,
+    gameWidth: 0,
+    gameHeight: 0,
+    xoffset: -0,
+    yoffset: -0,
+    meterPerPixel:1,
+    tecAngle:0,
+    alfaCh:0,
+    totalFoxes:0,
+    indexID:-1,
+    indexFox:-1,
+    gameStart: false,
+    disconnected: false,
+    leftButtonPress: false,
+
+    died: false,
+    resize:false,    
+    startPingTime: 0,
+    toggleMassState: 0,
+    backgroundColor: '#f2fbff',
+    lineColor: '#000000',
+};
