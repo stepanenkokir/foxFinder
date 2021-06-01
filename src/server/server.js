@@ -103,7 +103,12 @@ io.on('connection', (socket) => {
         sessID = socket.request.session.id;
         players[sessID].started = true;
         console.log("Start game for "+ players[sessID].name +" from "+sessID); 
-        console.log("Count of player = "+players.length);      
+        console.log("Count of player = "+players.length); 
+
+        socket.emit('gameSetup', {
+                gameWidth: settings.gameWidth,
+                gameHeight: settings.gameHeight
+            });     
     });
 
     socket.on('dscnct', function(){

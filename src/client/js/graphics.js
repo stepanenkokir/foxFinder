@@ -4,7 +4,7 @@ var global = require('./global');
 var pl=global.playerXY;
 function drawgrid() {
 
-    console.log("show grid! ="+ global.xoffset+" : "+ global.screenWidth+" || "+global.yoffset+ " | "+global.plXY.x+":"+global.plXY.y);
+    console.log("show grid! ="+ global.xoffset+" : "+ global.screenWidth+" || "+global.yoffset+ " | "+ global.screenHeight+"  |  "+global.plXY.x+":"+global.plXY.y);
     global.graphCtx.lineWidth = 1;
     global.graphCtx.strokeStyle = global.lineColor;
     global.graphCtx.globalAlpha = 1;

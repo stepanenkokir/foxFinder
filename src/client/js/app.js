@@ -74,6 +74,14 @@ socket.on("newPlayer", function() {
 	startPageShow();         
 });
 
+
+socket.on('gameSetup', function(data) {
+    global.gameWidth = data.gameWidth;
+    global.gameHeight = data.gameHeight;
+    System.debug("New size game = "+global.gameWidth+":"+global.gameHeight);
+    resize();
+});
+
 function countDown(times) 
 {	
 	document.getElementById("mainForm").appendChild(System.divBlinkText1);		
@@ -130,7 +138,7 @@ window.requestAnimFrame = (function() {
             window.mozRequestAnimationFrame    ||
             window.msRequestAnimationFrame     ||
             function( callback ) {
-                window.setTimeout(callback, 1000 / 60);
+                window.setTimeout(callback, 1000 / 100);
             };
 })();
 
@@ -158,28 +166,15 @@ function gameLoop() {
     	graph.fillStyle = global.backgroundColor;
     	graph.fillRect(0, 0, global.screenWidth, global.screenHeight);
 
-    	if (global.resize)
-    	{               
-        	resize();
-        	global.resize = false;
-    	}
+    	// if (global.resize)
+    	// {               
+     //    	resize();
+     //    	global.resize = false;
+    	// }
     
-    	if ((global.leftButtonPress)&&(global.onShowPeleng))
-    	{
-        	global.leftButtonPress = false;
-        
-        	pelengs.push({            
-            	idF: global.indexFox,
-            	x: player.x,
-            	y: player.y,
-            	alfa : global.alfaCh,
-            	angle: global.tecAngle,            
-            	hue: (global.indexFox*360/global.totalFoxes)
-        	});
-    	}
-
-
-    	Graphics.drawgrid();            
+    	
+    	//Graphics.drawgrid();            
+        drawgrid1();            
     	//foxes.forEach(drawFox);            
     	//barriers.forEach(drawBarriers);
     
@@ -190,7 +185,7 @@ function gameLoop() {
 
     	//drawPlayers();
                 
-    	socket.emit('0', window.canvas.target); // playerSendTarget "Heartbeat".
+    	//socket.emit('0', window.canvas.target); // playerSendTarget "Heartbeat".
 
 	}
 	else{
@@ -207,6 +202,32 @@ function gameLoop() {
 		}
 	}
 }
+
+
+function drawgrid1() {
+
+  //console.log("show grid1! ="+ global.xoffset+" : "+ global.screenWidth+" || "+global.yoffset+ " | "+ global.screenHeight+"  |  "+player.x+":"+player.y);
+  //console.log("GRID from "+ ( global.xoffset - player.x)+" to "+ global.screenWidth+" step "+global.screenHeight/10 +" total = "+(global.screenWidth - ( global.xoffset - player.x))/10);
+    graph.lineWidth = 1;
+    graph.strokeStyle = global.lineColor;
+    graph.globalAlpha = 1;
+    graph.beginPath();
+
+    for (var x = global.xoffset - player.x; x < global.screenWidth; x += global.screenHeight / 10) {     
+        graph.moveTo(x, 0);
+        graph.lineTo(x, global.screenHeight);
+    }
+
+    for (var y = global.yoffset - player.y ; y < global.screenHeight; y += global.screenHeight / 10) {
+        graph.moveTo(0, y);
+        graph.lineTo(global.screenWidth, y);
+    }
+    graph.stroke();
+    graph.globalAlpha = 1;
+}
+
+
+
 
 function disconnectFromServer(){
 	global.gameStart = false;
@@ -229,7 +250,7 @@ function disconnectFromServer(){
             window.cancelAnimationFrame(global.animLoopHandle);
             global.animLoopHandle = undefined;
         }
-    }, 2500);
+    }, 1000);
 }
 
 function startPageShow(){
