@@ -37,7 +37,10 @@ divInfo.id="infoBox";
 var miniMap = document.createElement("div");
 miniMap.id="miniMap";
 var divStatus = document.createElement("div");
+var spanStatus = document.createElement("span");
 divStatus.id="statusBox";
+spanStatus.id="spanStatus";
+
 
 var divBlinkText1 = document.createElement("div");
 var divBlinkText2 = document.createElement("div");
@@ -45,7 +48,12 @@ divBlinkText1.className="transition";
 divBlinkText2.className="transition-scale";
 divBlinkText1.innerHTML="ДО СТАРТА ";
 
+var divCloseBtn = document.createElement("div");
+divCloseBtn.className="cl-btn";
+divCloseBtn.innerHTML="<div class=\"cl-btn-in\"><div class=\"cl-btn-txt\">ВЫХОД</div></div>";
 
+divStatus.appendChild(divCloseBtn);
+divStatus.appendChild(spanStatus);
 
 
 exports.readCookie = readCookie;
@@ -56,5 +64,6 @@ exports.divAuth = divAuth;
 exports.divInfo = divInfo;
 exports.miniMap = miniMap;
 exports.divStatus = divStatus;
+exports.divCloseBtn = divCloseBtn;
 exports.divBlinkText1 = divBlinkText1;
 exports.divBlinkText2 = divBlinkText2;

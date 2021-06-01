@@ -18,6 +18,8 @@ module.exports = {
     gameHeight: 0,
     xoffset: -0,
     yoffset: -0,
+    plXY:{x:0,y:0},
+    graphCtx:0,
     meterPerPixel:1,
     tecAngle:0,
     alfaCh:0,

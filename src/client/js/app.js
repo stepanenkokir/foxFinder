@@ -1,6 +1,7 @@
 var Canvas = require('./canvas');
 var global = require('./global');
 var System = require('./system');
+var Graphics = require('./graphics');
 
 var io = require('socket.io-client');
 var socket = io();
@@ -10,6 +11,17 @@ var pelengs = [];
 window.canvas = new Canvas();
 var c = window.canvas.cv;
 var graph = c.getContext('2d');
+
+document.body.oncontextmenu = null;
+window.addEventListener("mousemove", stopEventPropagation, true); //disable background elements activity
+
+
+function stopEventPropagation(event) {
+    event.stopImmediatePropagation();
+}
+
+
+global.graphCtx = graph;
 
 
 var playerConfig = {
@@ -38,37 +50,29 @@ var target = {x: player.x, y: player.y, x1: player.x1, y1: player.y1, radius: gl
 global.target = target;
 
 
-
-
 socket.emit('firstConnect');
 
 socket.on("contGame", function(serverData) {			
 	document.getElementById("mainForm").appendChild(System.divInfo);
 	document.getElementById("mainForm").appendChild(System.miniMap);
 	document.getElementById("mainForm").appendChild(System.divStatus);
-    document.getElementById("statusBox").innerHTML=serverData.name+" В игре!!";	
+    document.getElementById("spanStatus").innerHTML=serverData.name+" В игре!!";	
     global.playerName = serverData.name;
     System.writeCookie('name',serverData.name,12);
 	if (serverData.time<5)
-    	countDown(5);
+    	countDown(2);
     else
+    {
+    	
+
     	socket.emit('startGame');
+    	startGame('player');	
+    }
 });
 
-socket.on("newPlayer", function() {	        
-    
-    document.getElementById("mainForm").appendChild(System.divAuth);
-
-    var btn = document.getElementById('btnStart');
-    btn.onclick = function () {
-    	var nName=document.getElementById("playerName").value;
-		if (nName.length==0)
-			nName="Player";
-			socket.emit('auth', nName);
-			document.getElementById("mainForm").removeChild(System.divAuth);		
-        };
+socket.on("newPlayer", function() {	  
+	startPageShow();         
 });
-
 
 function countDown(times) 
 {	
@@ -84,8 +88,7 @@ function countDown(times)
 			{					
 				socket.emit('startGame');
 				document.getElementById("mainForm").removeChild(System.divBlinkText1);		
-				document.getElementById("mainForm").removeChild(System.divBlinkText2);
-				global.gameStart = true;			
+				document.getElementById("mainForm").removeChild(System.divBlinkText2);			
 				startGame('player');						
 			}			
 		},0
@@ -93,22 +96,30 @@ function countDown(times)
 }
 
 
+System.divCloseBtn.onclick = function () {
+    socket.emit('dscnct');
+    global.disconnected=true;
+};
+
 function startGame(type) {
     
+    console.log("startGame");
     global.playerType = type;
+    global.gameStart = true;
+    global.disconnected = false;
 
     global.screenWidth = window.innerWidth;
     global.screenHeight = window.innerHeight;
    
-    if (!global.animLoopHandle)
-        animloop();
+     if (!global.animLoopHandle)
+         animloop();
    
-    socket.emit('respawn');   
-    window.canvas.socket = socket;
-    global.socket = socket;
-    pelengs.splice(0);
+    // socket.emit('respawn');   
+    // window.canvas.socket = socket;
+    // global.socket = socket;
+    // pelengs.splice(0);
 
-    System.debug("Sizescreen = "+global.screenWidth+":"+global.screenHeight);
+    System.debug("Sizescreen !!= "+global.screenWidth+":"+global.screenHeight);
 }
 
 
@@ -137,7 +148,13 @@ function animloop() {
 
 function gameLoop() {
 
-	if (global.gameStart) {
+//console.log("GameLoop "+global.gameStart+ " = "+global.disconnected);
+	
+
+	if (!global.disconnected && global.gameStart) {
+		
+		global.plXY ={x:player.x,y:player.y};
+
     	graph.fillStyle = global.backgroundColor;
     	graph.fillRect(0, 0, global.screenWidth, global.screenHeight);
 
@@ -162,91 +179,71 @@ function gameLoop() {
     	}
 
 
-    	drawgrid();            
+    	Graphics.drawgrid();            
     	//foxes.forEach(drawFox);            
     	//barriers.forEach(drawBarriers);
     
     	//pelengs.forEach(drawPelengs);
 
-    	if (global.borderDraw) {
-        	drawborder();
-    	}
+    	//if (global.borderDraw) drawborder();
+    	
 
     	//drawPlayers();
                 
     	socket.emit('0', window.canvas.target); // playerSendTarget "Heartbeat".
 
 	}
+	else{
+		if (global.disconnected)
+		{
+			graph.fillStyle ='#000000';
+			
+    		graph.fillRect(0, 0, global.screenWidth, global.screenHeight);
+			graph.fillStyle ='#FFFF00';
+			graph.font = 'bold 40px sans-serif';
+			graph.fillText('ОТКЛЮЧЕНИЕ...', global.screenWidth / 2-100, global.screenHeight / 2);
+			window.cancelAnimationFrame(global.animLoopHandle);
+			disconnectFromServer();
+		}
+	}
 }
 
-function drawgrid() {
+function disconnectFromServer(){
+	global.gameStart = false;
+    global.died = true;
 
-	System.debug("show grid! ="+ global.xoffset+" : "+ global.screenWidth+" || "+global.yoffset+ " | "+player.x+":"+player.y);
-     graph.lineWidth = 1;
-     graph.strokeStyle = global.lineColor;
-     graph.globalAlpha = 1;
-     graph.beginPath();
+	console.log(0);
+    document.getElementById("mainForm").removeChild(System.divInfo);
+    console.log(1);
+	document.getElementById("mainForm").removeChild(System.miniMap);
+	console.log(2);
+	document.getElementById("mainForm").removeChild(System.divStatus);
+	console.log(3);
 
-    for (var x = global.xoffset - player.x; x < global.screenWidth; x += global.screenHeight / 20) {
-        console.log("x = "+x);
-        graph.moveTo(x, 0);
-        graph.lineTo(x, global.screenHeight);
-    }
-
-    for (var y = global.yoffset - player.y ; y < global.screenHeight; y += global.screenHeight / 20) {
-        graph.moveTo(0, y);
-        graph.lineTo(global.screenWidth, y);
-    }
-    
-  
-    graph.stroke();
-    graph.globalAlpha = 1;
+    window.setTimeout(function() {
+    	graph.fillStyle ='#000000';		
+    	graph.fillRect(0, 0, global.screenWidth, global.screenHeight);
+        startPageShow();
+        global.died = false;
+        if (global.animLoopHandle) {
+            window.cancelAnimationFrame(global.animLoopHandle);
+            global.animLoopHandle = undefined;
+        }
+    }, 2500);
 }
 
-function drawborder() {
-    graph.lineWidth = 1;
-    graph.strokeStyle = playerConfig.borderColor;
-
-    // Left-vertical.
-    if (player.x <= global.screenWidth/2) {
-        graph.beginPath();
-        graph.moveTo(global.screenWidth/2 - player.x, 0 ? player.y > global.screenHeight/2 : global.screenHeight/2 - player.y);
-        graph.lineTo(global.screenWidth/2 - player.x, global.gameHeight + global.screenHeight/2 - player.y);
-        graph.strokeStyle = global.lineColor;
-        graph.stroke();
-    }
-
-    // Top-horizontal.
-    if (player.y <= global.screenHeight/2) {
-        graph.beginPath();
-        graph.moveTo(0 ? player.x > global.screenWidth/2 : global.screenWidth/2 - player.x, global.screenHeight/2 - player.y);
-        graph.lineTo(global.gameWidth + global.screenWidth/2 - player.x, global.screenHeight/2 - player.y);
-        graph.strokeStyle = global.lineColor;
-        graph.stroke();
-    }
-
-    // Right-vertical.
-    if (global.gameWidth - player.x <= global.screenWidth/2) {
-        graph.beginPath();
-        graph.moveTo(global.gameWidth + global.screenWidth/2 - player.x,
-                     global.screenHeight/2 - player.y);
-        graph.lineTo(global.gameWidth + global.screenWidth/2 - player.x,
-                     global.gameHeight + global.screenHeight/2 - player.y);
-        graph.strokeStyle = global.lineColor;
-        graph.stroke();
-    }
-
-    // Bottom-horizontal.
-    if (global.gameHeight - player.y <= global.screenHeight/2) {
-        graph.beginPath();
-        graph.moveTo(global.gameWidth + global.screenWidth/2 - player.x,
-                     global.gameHeight + global.screenHeight/2 - player.y);
-        graph.lineTo(global.screenWidth/2 - player.x,
-                     global.gameHeight + global.screenHeight/2 - player.y);
-        graph.strokeStyle = global.lineColor;
-        graph.stroke();
-    }
+function startPageShow(){
+    document.getElementById("mainForm").appendChild(System.divAuth);
+    var btn = document.getElementById('btnStart');
+    btn.onclick = function () {
+    	var nName=document.getElementById("playerName").value;
+		if (nName.length==0)
+			nName="Player";
+			socket.emit('auth', nName);
+			document.getElementById("mainForm").removeChild(System.divAuth);		
+        };	
 }
+
 
 window.addEventListener('resize', resize);
 

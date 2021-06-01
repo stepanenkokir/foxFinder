@@ -23,7 +23,7 @@ canvas {
     background-color: black;
     width: 100%;
     height: 100%;
-  
+
 }
 
 meta {
@@ -136,6 +136,61 @@ div{
    	transform: scale(4);
    	opacity: 0;
   }
+}
 
-  
+
+.cl-btn {
+    position: absolute;
+    right:1px;
+    top:5px;
+    margin: 5px auto;
+    width: 2.5vw;
+    cursor: pointer;
+}
+.cl-btn-in {
+    width: inherit;
+    text-align: center;
+}
+.cl-btn-txt { 
+    font-size: 10px; 
+    line-height: 20px;
+    text-transform: uppercase;
+
+    font-weight: bold;  
+    color: #337AB7;
+
+    transition: all .3s ease-in;
+    opacity: 0;
+    cursor: pointer;
+    font-family: Verdana;
+}
+.cl-btn-in:before, .cl-btn-in:after {
+    position: absolute;
+    content: '';
+    height: 4px;
+    width: inherit;
+    background: #337AB7;
+    left: 0;
+    transition: all .3s ease-in;
+}
+.cl-btn-in:before {
+    top: calc(50% - 4px); 
+    transform: rotate(45deg);  
+}
+.cl-btn-in:after {  
+    bottom: 50%;
+    transform: rotate(-45deg);  
+}
+.cl-btn:hover .cl-btn-txt {
+    opacity: 1;
+}
+.cl-btn:hover .cl-btn-in:before,
+.cl-btn:hover .cl-btn-in:after {
+    transform: rotate(0);
+}
+.cl-btn:hover .cl-btn-in:before {
+    top: 0;
+}
+.cl-btn:hover .cl-btn-in:after {
+    bottom: 0;
 }
