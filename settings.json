@@ -14,5 +14,5 @@
     "coeffTime":3,
     "slowBase": 4.5,    
     "networkUpdateFactor": 40,
-    "maxHeartbeatInterval": 30000
+    "maxHeartbeatInterval": 5000
 }

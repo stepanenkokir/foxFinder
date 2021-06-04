@@ -3,6 +3,7 @@ var upK = false;
 var dwK = false;
 var lfK = false;
 var rgK = false;
+
 class Canvas {
     constructor(params) {
         this.directionLock = false;
@@ -13,18 +14,16 @@ class Canvas {
         var self = this;
 
         this.cv = document.getElementById('cvs');
-        this.cv.width = global.screenWidth;
+        console.log("My cvs = "+this.cv);        
         this.cv.height = global.screenHeight;
         this.cv.addEventListener('mousemove', this.gameInput, false);
         this.cv.addEventListener('mousedown', this.gameClick, false);
-        this.cv.addEventListener('wheel', this.gameWheel, false);     
-        this.cv.addEventListener('keyup',function(event) {            
-            self.directionUp(event);
-        }, false);
-        this.cv.addEventListener('keydown', this.directionDown, false);       
-        this.cv.addEventListener('blur', this.myBlur, false);
+        this.cv.addEventListener('wheel', this.gameWheel, false);                                 
+        //this.cv.addEventListener('blur', this.myBlur, false);
         this.cv.parent = self;
-        global.canvas = this;    
+        global.canvas = this;  
+
+        console.log("My cvs = "+this);          
     }
 
     gameInput(mouse) {  
@@ -33,7 +32,8 @@ class Canvas {
         this.parent.target.x1 = mouse.clientX - this.width / 2;
         this.parent.target.y1 = mouse.clientY - this.height / 2;       
         global.target = this.parent.target;  
-        global.tecAngle = Math.atan2(this.parent.target.y1, this.parent.target.x1);
+        global.tecAngle = Math.atan2(this.parent.target.y1, this.parent.target.x1);            
+        if(global.gameStart) global.canvas.socket.emit('0', global.target);       
     }
 
     gameClick(event){
@@ -47,7 +47,8 @@ class Canvas {
                     // console.log ("Middle button is pressed");
                 break;
                 case 3:
-                    // console.log ("Right button is pressed");
+                //     console.log ("Right button is pressed");
+                     event.preventDefault();
                 break;
             }
         }
@@ -55,6 +56,7 @@ class Canvas {
 
     gameWheel(e)
     {
+        console.log("WHEELMOUSE!!!");
         /*
         e = e || window.event;
         var delta = e.deltaY || e.detail || e.wheelDelta;
@@ -80,60 +82,9 @@ class Canvas {
         */
     }
 
-    directionDown(event) {
-        var key = event.which || event.keyCode;
-               
-        var self = this.parent; // have to do this so we are not using the cv object
-        if (self.directional(key)) {
-            self.directionLock = false;
-            if (self.newDirection(key, self.directions, true)) {
-                self.updateTarget(self.directions);
-                self.socket.emit('0', self.target);
-            }
-        }
-    }
+    
 
-    // Function called when a key is lifted, will change direction if arrow key.
-    directionUp(event) {        
-        var key = event.which || event.keyCode;
-        
-        if (this.directional(key)) { // this == the actual class
-            if (this.newDirection(key, this.directions, false)) {
-                this.updateTarget(this.directions);
-                if (this.directions.length === 0) this.directionLock = false;
-                this.socket.emit('0', this.target);
-            }
-        }
-    }
-
-     updateTarget(list) {    
-        this.target.x = 0;
-        this.target.y = 0;
-        this.target.x1 = global.target.x1;
-        this.target.y1 = global.target.y1;
-        //this.parent.target.y1 = global.target.y1;    
-        var directionHorizontal = 0;
-        var directionVertical = 0;
-        for (var i = 0, len = list.length; i < len; i++) {
-            if (directionHorizontal === 0) {
-                if (list[i] == global.KEY_LEFT) directionHorizontal -= Number.MAX_VALUE;
-                else if (list[i] == global.KEY_RIGHT) directionHorizontal += Number.MAX_VALUE;
-            }
-            if (directionVertical === 0) {
-                if (list[i] == global.KEY_UP) directionVertical -= Number.MAX_VALUE;
-                else if (list[i] == global.KEY_DOWN) directionVertical += Number.MAX_VALUE;
-            }
-        }
-        this.target.x += directionHorizontal;
-        this.target.y += directionVertical;
-        
-        
-        global.target = this.target;
-    }
-
-    directional(key) {
-        return this.horizontal(key) || this.vertical(key);
-    }
+    
 
     horizontal(key) {
         return key == global.KEY_LEFT || key == global.KEY_RIGHT;
@@ -143,8 +94,112 @@ class Canvas {
         return key == global.KEY_DOWN || key == global.KEY_UP;
     }
 
+    directional(key) {
+        return this.horizontal(key) || this.vertical(key);
+    }
+
+    newDirection(direction, list, isAddition) {
+        var result = false;
+        var found = false;
+        for (var i = 0, len = list.length; i < len; i++) {
+            if (list[i] == direction) {
+                found = true;
+                if (!isAddition) {
+                    result = true;
+                    // Removes the direction.
+                    list.splice(i, 1);
+                }
+                break;
+            }
+        }
+        // Adds the direction.
+        if (isAddition && found === false) {
+            result = true;
+            list.push(direction);
+        }
+        return result;
+    }
+
+
+    directionDown(event) {        
+
+        if (!global.gameStart)       
+            return;
+
+        var key = event.which || event.keyCode;   
+        var self = global.canvas; // have to do this so we are not using the cv object       
+        if (key==global.KEY_SHIFT)  
+            self.target.shift=true;    
+            
+        
+        
+        if (self.directional(key)) {
+            self.directionLock = false;
+            if (self.newDirection(key, self.directions, true)) {
+                self.updateTarget(self.directions);
+                self.socket.emit('0', self.target);                            
+              //  console.log("DOWN "+ self.target.x+":"+self.target.y+ " | " + self.target.x1+":"+self.target.y1);
+            }            
+        }       
+    }
+
+    directionUp(event) {      
+        if (!global.gameStart)       
+            return;
+        var key = event.which || event.keyCode;
+      //  console.log("Press Up!! "+key);  
+        var self = global.canvas; // have to do this so we are not using the cv object
+
+        if (key==global.KEY_SHIFT)                    
+            self.target.shift=false;
+        
+        
+        if (self.directional(key)) { // this == the actual class
+            if (self.newDirection(key, self.directions, false)) {
+                self.updateTarget(self.directions);
+                if (self.directions.length === 0) self.directionLock = false;
+                self.socket.emit('0', self.target);
+             //   console.log("UP "+ self.target.x+":"+self.target.y+ " | " + self.target.x1+":"+self.target.y1);
+            }
+        }
+    }
+
+     updateTarget(list) {    
+        this.target.x = 0;
+        this.target.y = 0;
+        this.target.x1 = global.target.x1;
+        this.target.y1 = global.target.y1;
+        
+        //this.parent.target.y1 = global.target.y1;    
+        var directionHorizontal = 0;
+        var directionVertical = 0;
+        for (var i = 0, len = list.length; i < len; i++) {
+            if (directionHorizontal === 0) {
+                //if (list[i] == global.KEY_LEFT) directionHorizontal -= Number.MAX_VALUE;                
+                //else if (list[i] == global.KEY_RIGHT) directionHorizontal += Number.MAX_VALUE;
+
+                if (list[i] == global.KEY_LEFT) directionHorizontal -= 1;
+                else if (list[i] == global.KEY_RIGHT) directionHorizontal += 1;
+            }
+            if (directionVertical === 0) {
+                //if (list[i] == global.KEY_UP) directionVertical -= Number.MAX_VALUE;
+                //else if (list[i] == global.KEY_DOWN) directionVertical += Number.MAX_VALUE;
+                if (list[i] == global.KEY_UP) directionVertical -= 1;
+                else if (list[i] == global.KEY_DOWN) directionVertical += 1;
+            }
+        }
+        this.target.x += directionHorizontal;
+        this.target.y += directionVertical;        
+        
+        global.target = this.target;
+    }
+
+    
+
      myBlur(event)
     {
+
+        console.log("Blur canvas :o(");
         global.target.x = 0;
         global.target.y = 0; 
        this.target =  global.target;

@@ -18,7 +18,6 @@ module.exports = {
     gameHeight: 0,
     xoffset: -0,
     yoffset: -0,
-    plXY:{x:0,y:0},
     graphCtx:0,
     meterPerPixel:1,
     tecAngle:0,
@@ -28,8 +27,8 @@ module.exports = {
     indexFox:-1,
     gameStart: false,
     disconnected: false,
-    leftButtonPress: false,
-
+    leftButtonPress: false,    
+    player:{},
     died: false,
     resize:false,    
     startPingTime: 0,

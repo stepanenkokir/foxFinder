@@ -43,16 +43,25 @@ div{
 }
 #container canvas { position:absolute; top:0; left:0; z-index:0 }
 
-#authBox{	
+#authBox,#loginBox,#signinBox{	
 	position: relative;	
 	border: solid 2px #dcdc00; 
-	height: 100px;
 	width:50%;
 	font-size: 16px;
 	font-weight: bold;
 	/*vertical-align: middle;*/
 	display: table-cell;
 	background-color: #ccc;
+}
+#authBox{
+	height: 100px;
+}
+#loginBox{
+	height: 150px;
+}
+
+#signinBox{
+	height: 200px;
 }
 
 #infoBox{	
@@ -93,7 +102,13 @@ div{
 
 
 .w100{
-	width:100%;
+	width:100%;	
+}
+
+.w75{
+	margin:auto;
+	text-align: right;
+	width:75%;
 }
 
 .transition {
