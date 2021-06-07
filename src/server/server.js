@@ -118,7 +118,8 @@ io.on('connection', function(socket){
         sockets[sessID] = socket;
         players[sessID].lastHeartbeat = new Date().getTime();
         players[sessID].id = sessID;
-        players[sessID].target={x:0,y:0,x1:0,y1:0, shift:false};
+        //players[sessID].target={x:0,y:0,x1:0,y1:0, shift:false};
+        players[sessID].target={st:0,dir:0,shift:false};
         players[sessID].x=position.x;
         players[sessID].y=position.y;
         players[sessID].radius = 10;
@@ -149,12 +150,9 @@ io.on('connection', function(socket){
     socket.on('0', function(target) {
         sessID = socket.request.session.id;
         if (sessID in players)
-        {
-       // console.log("FROM CLIENT!!  "+players[sessID].name + " going to "+target.x+":"+target.y+":"+target.x1+":"+target.y1);
-            players[sessID].lastHeartbeat = new Date().getTime();
-           // if (target.x !== players[sessID].target.x || target.y !== players[sessID].target.y) {
-                players[sessID].target = target;
-            //}
+        {      
+            players[sessID].lastHeartbeat = new Date().getTime();         
+            players[sessID].target = target;        
         }        
     });
 });
@@ -176,15 +174,13 @@ function movePlayer(player) {
     var x =0,y =0;
     var prCol = false;
     var target = {
-        x: player.target.x,
-        y: player.target.y,  
-        x1: player.target.x1,
-        y1: player.target.y1,
+        st: player.target.st,
+        dir: player.target.direct,          
         shift: player.target.shift, 
     };   
-    
-   // console.log("MyTarget = "+target.x+" : "+target.y+" : "+target.x1+" : "+ target.y1);
+       
     var newPlayer = {x:0, y:0}; 
+
 /*
     var dist = Math.sqrt(Math.pow(target.y, 2) + Math.pow(target.x, 2));
     var deg = Math.atan2(target.y, target.x);
@@ -206,9 +202,10 @@ function movePlayer(player) {
     if (deg1<0)
             deg1+=2*Math.PI;
     */
-    var deg2 = Math.atan2(target.y1, target.x1);
-    if (deg2<0)
-            deg2+=2*Math.PI;
+    //var deg2 = Math.atan2(target.y1, target.x1);
+    //if (deg2<0)
+    //       deg2+=2*Math.PI;
+    
     var slowDown = 2;    
     var AlphaChannel = 0.02;
 /*
@@ -241,6 +238,46 @@ function movePlayer(player) {
 
     var step = (target.shift)?3:1;   
     var dX=0 ,dY= 0;    
+    
+    if (target.st==1){                
+        dX = -player.speed*step;        
+    }
+
+    if (target.st==2){        
+        dY = -player.speed*step;        
+        dX = -player.speed*step;        
+    }
+
+    if (target.st==3)    
+        dY = -player.speed*step;        
+    
+    if (target.st==4){        
+        dY = -player.speed*step;        
+        dX = player.speed*step;        
+    }
+
+    if (target.st==5){                
+        dX = player.speed*step;        
+    }
+
+    if (target.st==6){        
+        dY = player.speed*step;        
+        dX = player.speed*step;        
+    }
+
+    if (target.st==7){        
+        dY = player.speed*step;                
+    }
+
+    if (target.st==8){        
+        dY = player.speed*step;        
+        dX = -player.speed*step;        
+    }
+
+    
+
+    /*
+    
     if (target.x>0)    
         dX = player.speed*step;        
     if (target.x<0)    
@@ -256,7 +293,11 @@ function movePlayer(player) {
     if (!isNaN(dX)) {        
         newPlayer.x =  player.x + dX;
     }
-    
+    */
+
+    newPlayer.x =  player.x + dX;
+    newPlayer.y =  player.y + dY;
+
     var borderCalc = player.radius / 3;
     if (player.x > settings.gameWidth - borderCalc) {
         newPlayer.x = settings.gameWidth - borderCalc;
@@ -277,7 +318,8 @@ function movePlayer(player) {
     {        
         player.x = newPlayer.x;
         player.y = newPlayer.y;
-        player.direct = deg2;
+        player.direct = target.dir;
+        player.st = target.st;
         player.alfa = AlphaChannel;
         player.nearZone = false;// (dist1<500);
     }   
@@ -341,11 +383,12 @@ function moveloop(){
                     x:players[sess].x,
                     y:players[sess].y,
                     direct:players[sess].direct,
+                    st:players[sess].target.st,
                     alfa:players[sess].alfa,
                     nearZone:players[sess].nearZone,
                 };
                 playersInfo.push(t_playersInfo);    
-                //console.log("Move Players "+players[sess].name);         
+             //  console.log("Move Players "+t_playersInfo.direct);         
             }                    
           cntPlayer++;  
         }

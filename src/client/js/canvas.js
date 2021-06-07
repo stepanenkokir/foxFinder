@@ -7,7 +7,7 @@ var rgK = false;
 class Canvas {
     constructor(params) {
         this.directionLock = false;
-        global.target = { x : 0, y: 0, x1:0, y1:0 };
+        global.target = { st : 0, direct: 0, shift:0 };
         this.target = global.target;       
         this.socket = global.socket;
         this.directions = [];
@@ -29,21 +29,23 @@ class Canvas {
     }
 
     gameInput(mouse) {  
-        this.parent.target.x = global.target.x;        
-        this.parent.target.y =global.target.y;        
+         this.parent.target.st = global.target.st;        
+       // this.parent.target.x = global.target.x;        
+       // this.parent.target.y =global.target.y;        
         
         //this.parent.target.x1 = mouse.clientX - this.width / 2;
         //this.parent.target.y1 = mouse.clientY - this.height / 2;   
 
-        this.parent.target.x1 = mouse.clientX - global.realWidth / 2;
-        this.parent.target.y1 = mouse.clientY - global.realHeight / 2;   
+        let dx = mouse.clientX - global.realWidth / 2;
+        let dy = mouse.clientY - global.realHeight / 2;   
+        
+        global.tecAngle = Math.atan2(dy, dx);  
+        this.parent.target.direct=global.tecAngle;
+        global.target = this.parent.target;          
+        if(global.gameStart)    
+            global.canvas.socket.emit('0', global.target);              
 
-        //  let xx1 = mouse.clientX - global.realWidth / 2;
-        // let yy1 = mouse.clientY - global.realHeight / 2;   
-        //console.log("MOUSE: "+this.parent.target.x1+":"+this.parent.target.y1+" vs "+xx1+":"+yy1);    
-        global.target = this.parent.target;  
-        global.tecAngle = Math.atan2(this.parent.target.y1, this.parent.target.x1);            
-        if(global.gameStart) global.canvas.socket.emit('0', global.target);       
+
     }
 
     gameClick(event){
@@ -183,10 +185,8 @@ class Canvas {
     }
 
      updateTarget(list) {    
-        this.target.x = 0;
-        this.target.y = 0;
-        this.target.x1 = global.target.x1;
-        this.target.y1 = global.target.y1;
+        this.target.st = 0;
+        this.target.dir = global.tecAngle;
         
         //this.parent.target.y1 = global.target.y1;    
         var directionHorizontal = 0;
@@ -206,9 +206,20 @@ class Canvas {
                 else if (list[i] == global.KEY_DOWN) directionVertical += 1;
             }
         }
-        this.target.x += directionHorizontal;
-        this.target.y += directionVertical;        
+        //tx += directionHorizontal;
+        //ty += directionVertical;        
         
+        if (directionHorizontal<0 && directionVertical==0) this.target.st =1;
+        if (directionHorizontal<0 && directionVertical<0) this.target.st =2;
+        if (directionHorizontal==0 && directionVertical<0) this.target.st =3;
+        if (directionHorizontal>0 && directionVertical<0) this.target.st =4;
+        if (directionHorizontal>0 && directionVertical==0) this.target.st =5;
+        if (directionHorizontal>0 && directionVertical>0) this.target.st =6;
+        if (directionHorizontal==0 && directionVertical>0) this.target.st =7;
+        if (directionHorizontal<0 && directionVertical>0) this.target.st =8;
+        
+        //console.log(" DirH +"+directionHorizontal+" : "+directionVertical + " = "+this.target.st );
+
         global.target = this.target;
     }
 
@@ -216,14 +227,10 @@ class Canvas {
 
      myBlur(event)
     {
-
-        console.log("Blur canvas :o(");
-        global.target.x = 0;
-        global.target.y = 0; 
-       this.target =  global.target;
-       var self = this.parent;
-      //  this.directions.splice(0);  
-       self.directions.splice(0);  
+      //   console.log("Blur canvas :o(");      
+        this.target =  global.target;
+        var self = this.parent;        
+            self.directions.splice(0);  
     }
 
 }

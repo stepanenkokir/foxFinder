@@ -23,6 +23,7 @@ canvas {
     background-color: black;
     width: 100vw;
     height: 100vh;
+    opacity: 1;
 
 }
 
@@ -39,6 +40,7 @@ div{
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    opacity: 1;
     
 }
 #container canvas { position:absolute; top:0; left:0; z-index:0 }

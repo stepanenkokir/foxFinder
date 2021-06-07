@@ -32,10 +32,8 @@ var player = {
     y: global.screenHeight / 2,
     screenWidth: global.screenWidth,
     screenHeight: global.screenHeight,    
-    target:{ x:0,
-    		 y:0,
-    		 z1:0,
-    		 y1:0,
+    target:{ st:0,
+    		 direct:0,    		 
     		 shift:false},
 };
 global.player = player;
@@ -173,8 +171,8 @@ function setupSocket(socket)
    		global.gameWidth = data.gameWidth;
     	global.gameHeight = data.gameHeight;
     	player.x = data.positions.x;
-    	player.y = data.positions.y;
-    	player.id=data.id;    	
+    	player.y = data.positions.y;    	
+        global.id = data.id;  	
     	console.log("CRD : "+data.positions.x+":"+data.positions.y);
     	resize();
     		
@@ -183,14 +181,16 @@ function setupSocket(socket)
 
 	socket.on("moveInfo", function(usersInfo) {	  
 		users=usersInfo;
+
 		users.forEach(function(u){			
-			if (u.id===player.id)
+			if (u.id===global.id)
 			{				
 				let offsX = player.x - u.x;
 				let offsY = player.y - u.y;			
 				player.x = u.x;
     			player.y = u.y;
     			player.alfa=u.alfa;
+                player.direct=u.direct;
 			}
 		});
 	});
@@ -271,7 +271,8 @@ function gameLoop() {
     		graph.fillRect(0, 0, global.screenWidth, global.screenHeight);
     	
     		Graphics.drawgrid();  
-    		Graphics.drawPlayers(users);              
+    	
+        	Graphics.drawPlayers(users);              
                   
  		   	//foxes.forEach(drawFox);            
     		//barriers.forEach(drawBarriers);    

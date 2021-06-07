@@ -15,6 +15,7 @@ function drawgrid() {
 
    // console.log("show grid! ="+ global.xoffset+" : "+ global.screenWidth+" || "+global.yoffset+ " | "+ global.screenHeight+"  |  "+global.player.x+":"+global.player.y);
     global.graphCtx.lineWidth = 1;
+   // global.graphCtx.globalCompositeOperation="destination-over";
     global.graphCtx.strokeStyle = global.lineColor;
     global.graphCtx.globalAlpha = 1;
     global.graphCtx.beginPath();
@@ -71,6 +72,8 @@ function drawgrid() {
         global.graphCtx.stroke();        
     }
     global.graphCtx.globalAlpha = 1;
+
+   
   
 }
 
@@ -81,6 +84,8 @@ function drawPlayers(users) {
         y: global.player.y - (global.screenHeight / 2)
     };
 
+
+    //drawgrid();
    // console.log("Draw men "+global.player.x+":"+global.player.y);
 
     //drawMen(global.player.x, global.player.y, global.tecAngle,0); 
@@ -92,10 +97,12 @@ function drawPlayers(users) {
    
     
         var testMys = 0;
-        var userCurrent = users[z];
+       // var userCurrent = users[z];
         var crdUser = {
-            x: userCurrent.x - start.x + 10,
-            y: userCurrent.y - start.y + 10
+            x: users[z].x - start.x + 10,
+            y: users[z].y - start.y + 10,
+            st:users[z].st,
+            angl:users[z].direct,
         };
       
       /*  
@@ -115,42 +122,37 @@ function drawPlayers(users) {
         //drawMen(crdUser.x, crdUser.y, userCurrent.direct,testMys);      
 
         let indFr = Math.floor(global.currentFrame/global.framePerSec);
-        
-        if (global.target.x==0 && global.target.y==0)        
-            global.currentFrame=0;    
+      
+        if (crdUser.st==0)
+        {
 
-        if (global.target.x==1 && global.target.y==0)
-            direct=4;
-
-        if (global.target.x==-1 && global.target.y==0)
-            direct=0;
-
-        if (global.target.x==0 && global.target.y==1)
+            indFr=4;    
             direct=6;
 
-        if (global.target.x==0 && global.target.y==-1)
-            direct=2;
+        }
+        else
+            direct=crdUser.st-1;
 
-         if (global.target.x==1 && global.target.y==1)
-            direct=5;
+        
+        drawWalkMen(direct,indFr,crdUser.x-50, crdUser.y-50);        
 
-        if (global.target.x==1 && global.target.y==-1)
-            direct=3;
+     //   console.log("User = "+z+" = "+crdUser.angl + " : "+crdUser.st);
+        if (users[z].id==global.id)
+        {
+            global.graphCtx.lineWidth = 1;
+            global.graphCtx.strokeStyle = "#111111";
+            global.graphCtx.moveTo(crdUser.x, crdUser.y);    
+            global.graphCtx.lineTo(crdUser.x+150*Math.cos(crdUser.angl),crdUser.y+150*Math.sin(crdUser.angl));            
+            global.graphCtx.stroke();
+        }
 
-         if (global.target.x==-1 && global.target.y==1)
-            direct=7;
-
-        if (global.target.x==-1 && global.target.y==-1)
-            direct=1;
-
-
-        drawWalkMen(direct,indFr,crdUser.x, crdUser.y);
 
         global.currentFrame++;
 
         if (global.currentFrame>=global.framePerSec*8)
             global.currentFrame=0;
-    }  
+    }
+
     
 }
 
@@ -165,10 +167,10 @@ function showText(text)
 
 function drawWalkMen( direction,  frame, x,y) {
 
-   global.graphCtx.drawImage(walker, 
+   // global.graphCtx.globalCompositeOperation="source-over";
+    global.graphCtx.drawImage(walker, 
                 frame*128, direction*128, 128, 128,
-                x,y,30,68
-    );
+                x,y,100,100    );
 
 
 }
