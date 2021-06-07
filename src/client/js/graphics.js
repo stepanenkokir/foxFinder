@@ -10,6 +10,8 @@ let walker = new Image();
 walker.src = "/image/walk.png";
 
 var direct=0;
+var oldA;
+
 
 function drawgrid() {
 
@@ -103,6 +105,7 @@ function drawPlayers(users) {
             y: users[z].y - start.y + 10,
             st:users[z].st,
             angl:users[z].direct,
+            degAngl:90+(users[z].direct/Math.PI*180),
         };
       
       /*  
@@ -125,9 +128,68 @@ function drawPlayers(users) {
       
         if (crdUser.st==0)
         {
+            if (crdUser.degAngl<0)crdUser.degAngl+=360;
+            if (crdUser.degAngl>360)crdUser.degAngl-=360;
+            
+            if (oldA!=crdUser.degAngl)
+            {
+                
+               
 
-            indFr=4;    
-            direct=6;
+
+               // console.log("angle = "+crdUser.degAngl);
+                oldA = crdUser.degAngl;
+
+            }
+
+           if (crdUser.degAngl>=337.5 && crdUser.degAngl<22.5)
+           {
+                indFr=0;    
+                direct=2;
+           }
+
+           if (crdUser.degAngl>=22.5 && crdUser.degAngl<67.5)
+           {
+                indFr=5;    
+                direct=3;
+           }
+
+           if (crdUser.degAngl>=67.5 && crdUser.degAngl<112.5)
+           {
+                indFr=1;    
+                direct=4;
+           }
+
+           if (crdUser.degAngl>=112.5 && crdUser.degAngl<157.5)
+           {
+                indFr=4;    
+                direct=5;
+           }
+
+           if (crdUser.degAngl>=157.5 && crdUser.degAngl<202.5)
+           {
+                indFr=4;    
+                direct=6;
+           }
+
+           if (crdUser.degAngl>=202.5 && crdUser.degAngl<247.5)
+           {
+                indFr=4;    
+                direct=7;
+           }
+
+           if (crdUser.degAngl>=247.5 && crdUser.degAngl<292.5)
+           {
+                indFr=4;    
+                direct=0;
+           }
+
+           if (crdUser.degAngl>=292.5 && crdUser.degAngl<337.5)
+           {
+                indFr=4;    
+                direct=1;
+           }
+            
 
         }
         else
