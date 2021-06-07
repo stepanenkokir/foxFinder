@@ -1,6 +1,16 @@
 
 var global = require('./global');
 
+let img = new Image();
+// Назначение путь до картинки
+img.src = "/image/man_1.png";
+
+let walker = new Image();
+// Назначение путь до картинки
+walker.src = "/image/walk.png";
+
+var direct=0;
+
 function drawgrid() {
 
    // console.log("show grid! ="+ global.xoffset+" : "+ global.screenWidth+" || "+global.yoffset+ " | "+ global.screenHeight+"  |  "+global.player.x+":"+global.player.y);
@@ -19,15 +29,14 @@ function drawgrid() {
         global.graphCtx.lineTo(global.screenWidth, y);
     }
     global.graphCtx.stroke();
-    
-    global.graphCtx.strokeStyle = "#CCCCCC";
+       
     global.graphCtx.lineWidth = 5;
     // Left-vertical.
     if (global.player.x <= global.screenWidth/2) {
         global.graphCtx.beginPath();
         global.graphCtx.moveTo(global.screenWidth/2 - global.player.x, 0 ? global.player.y > global.screenHeight/2 : global.screenHeight/2 - global.player.y);
         global.graphCtx.lineTo(global.screenWidth/2 - global.player.x, global.gameHeight + global.screenHeight/2 - global.player.y);
-        global.graphCtx.strokeStyle = global.lineColor;
+        global.graphCtx.strokeStyle = global.borderColor;
         global.graphCtx.stroke();
     }
 
@@ -36,7 +45,7 @@ function drawgrid() {
         global.graphCtx.beginPath();
         global.graphCtx.moveTo(0 ? global.player.x > global.screenWidth/2 : global.screenWidth/2 - global.player.x, global.screenHeight/2 - global.player.y);
         global.graphCtx.lineTo(global.gameWidth + global.screenWidth/2 - global.player.x, global.screenHeight/2 - global.player.y);
-        global.graphCtx.strokeStyle = global.lineColor;
+        global.graphCtx.strokeStyle = global.borderColor;
         global.graphCtx.stroke();
     }
 
@@ -47,7 +56,7 @@ function drawgrid() {
                      global.screenHeight/2 - global.player.y);
         global.graphCtx.lineTo(global.gameWidth + global.screenWidth/2 - global.player.x,
                      global.gameHeight + global.screenHeight/2 - global.player.y);
-        global.graphCtx.strokeStyle = global.lineColor;
+        global.graphCtx.strokeStyle = global.borderColor;
         global.graphCtx.stroke();
     }
 
@@ -58,10 +67,11 @@ function drawgrid() {
                      global.gameHeight + global.screenHeight/2 - global.player.y);
         global.graphCtx.lineTo(global.screenWidth/2 - global.player.x,
                      global.gameHeight + global.screenHeight/2 - global.player.y);
-        global.graphCtx.strokeStyle = global.lineColor;
+        global.graphCtx.strokeStyle = global.borderColor;
         global.graphCtx.stroke();        
     }
     global.graphCtx.globalAlpha = 1;
+  
 }
 
 
@@ -100,11 +110,68 @@ function drawPlayers(users) {
                 testMys=2;
         }
         */
-        drawMen(crdUser.x, crdUser.y, userCurrent.direct,testMys);      
+
+       // global.graphCtx.drawImage(img, crdUser.x, crdUser.y, 30, 68);
+        //drawMen(crdUser.x, crdUser.y, userCurrent.direct,testMys);      
+
+        let indFr = Math.floor(global.currentFrame/global.framePerSec);
+        
+        if (global.target.x==0 && global.target.y==0)        
+            global.currentFrame=0;    
+
+        if (global.target.x==1 && global.target.y==0)
+            direct=4;
+
+        if (global.target.x==-1 && global.target.y==0)
+            direct=0;
+
+        if (global.target.x==0 && global.target.y==1)
+            direct=6;
+
+        if (global.target.x==0 && global.target.y==-1)
+            direct=2;
+
+         if (global.target.x==1 && global.target.y==1)
+            direct=5;
+
+        if (global.target.x==1 && global.target.y==-1)
+            direct=3;
+
+         if (global.target.x==-1 && global.target.y==1)
+            direct=7;
+
+        if (global.target.x==-1 && global.target.y==-1)
+            direct=1;
+
+
+        drawWalkMen(direct,indFr,crdUser.x, crdUser.y);
+
+        global.currentFrame++;
+
+        if (global.currentFrame>=global.framePerSec*8)
+            global.currentFrame=0;
     }  
     
 }
 
+
+function showText(text)
+{
+    global.graphCtx.fillStyle ='#111111';
+    global.graphCtx.font = 'bold 20px sans-serif';   
+    global.graphCtx.fillText(text,100,100);
+
+}
+
+function drawWalkMen( direction,  frame, x,y) {
+
+   global.graphCtx.drawImage(walker, 
+                frame*128, direction*128, 128, 128,
+                x,y,30,68
+    );
+
+
+}
 
 function drawMen(centerX,centerY, peleng, showPeleng)
 {    

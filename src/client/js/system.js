@@ -20,38 +20,36 @@ function debug(args) {
 
 function authorizedForm()
 {	
-	let tHTML="<div class=\"w100\">";
-	// let oldPlayerName =readCookie('name');
-	// if (oldPlayerName===undefined || oldPlayerName=="indefined")
+	let tHTML="<table id=\"tblMenu\">";
 	let	oldPlayerName="Player";
-	tHTML+="Ваше имя: <input autofocus id=\"playerName\" type=\"text\" value=\""+oldPlayerName+"\" /><br>";	
-	tHTML+="<button class=\"w100\" id=\"btnStart\">Начать</button>";
-	tHTML+="<div class=\"w100\"><button id=\"btnLogin\">Войти</button>";
-	tHTML+="<button id=\"btnSignin\">Зарегистрироваться</button></div>";
-	tHTML+="</div>";
+	tHTML+="<tr><td>Ваше имя:</td><td colspan=3><input autofocus id=\"playerName\" type=\"text\" value=\""+oldPlayerName+"\" /></td></tr>";	
+	tHTML+="<tr><td colspan=4><button class=\"w100 h50\" id=\"btnStart\">Начать</button></td></tr>";
+	tHTML+="<tr><td colspan=2><button class=\"w100 h20\"id=\"btnLogin\">Войти</button></td>";
+	tHTML+="<td colspan=2><button class=\"w100 h20\" id=\"btnSignin\">Зарегистрироваться</button></td></tr>";
+	tHTML+="</table>";
 	return tHTML;
 }
 
 function loginForm()
 {	
-	let tHTML="<div class=\"w100\">";	
-	tHTML+="Ваше имя: <input autofocus id=\"playerName\" type=\"text\" /><br>";	
-	tHTML+="E-mail:<input id=\"playerMail\" type=\"text\" /><br>";	
-	tHTML+="Пароль:<input id=\"playerPasswd\" type=\"password\" /><br>";	
-	tHTML+="<button class=\"w100\" id=\"btnStart\">Начать</button>";	
-	tHTML+="</div>";
+	let tHTML="<table id=\"tblMenu\">";
+	tHTML+="<tr><td>Ваше имя:</td><td><input autofocus id=\"playerName\" type=\"text\" /></td></tr>";	
+	tHTML+="<tr><td>E-mail:</td><td><input id=\"playerMail\" type=\"text\" /></td></tr>";		
+	tHTML+="<tr><td>Пароль:</td><td><input id=\"playerPasswd\" type=\"password\" /></td></tr>";		
+	tHTML+="<tr><td colspan=2><button class=\"w100 h20\" id=\"btnStart\">Начать</button></td></tr>";		
+	tHTML+="</table>";
 	return tHTML;
 }
 
 function signinForm()
 {	
-let tHTML="<div class=\"w100\"><table class=\"w75\">";	
+let tHTML="<table id=\"tblMenu\">";	
 	tHTML+="<tr><td>Ваше имя:</td><td><input autofocus id=\"playerName\" type=\"text\" /></td></tr>";	
 	tHTML+="<tr><td>E-mail:</td><td><input id=\"playerMail\" type=\"text\" /></td></tr>";	
 	tHTML+="<tr><td>Пароль:</td><td><input id=\"playerPasswd\" type=\"password\" /></td></tr>";	
 	tHTML+="<tr><td>Повтор пароля:</td><td><input id=\"playerPasswd2\" type=\"password\" /></td></tr>";	
-	tHTML+="<tr><td colspan=2><button class=\"w100\" id=\"btnStart\">Зарегистрировать</button></td></tr>";	
-	tHTML+="</table></div>";	
+	tHTML+="<tr><td colspan=2><button class=\"w100 h20\" id=\"btnStart\">Зарегистрировать</button></td></tr>";	
+	tHTML+="</table>";	
 	return tHTML;
 }
 

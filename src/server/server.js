@@ -6,6 +6,7 @@ const session = require("express-session");
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const settings = require('../../settings.json');
+const path = require('path');
 const PORT = process.env.PORT || settings.port;
 
 var util = require('./lib/util');
@@ -40,6 +41,14 @@ io.use(function(socket, next){
 
 app.use(sessionMiddleware);
 app.use(express.static(__dirname + '/../client'));
+
+app.get('/image/:fileName', (req, res, next) => {
+  res.type('png');
+ // console.log("try send image "+req.params.fileName);
+  res.sendFile(
+    path.resolve(`${path.join(__dirname, '../client/images')}/${req.params.fileName}`)
+  );
+});
 
 
 

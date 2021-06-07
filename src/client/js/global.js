@@ -14,6 +14,9 @@ module.exports = {
     // Canvas
     screenWidth: window.innerWidth,
     screenHeight: window.innerHeight,
+
+    realWidth: window.innerWidth,
+    realHeight: window.innerHeight,
     gameWidth: 0,
     gameHeight: 0,
     xoffset: -0,
@@ -29,10 +32,15 @@ module.exports = {
     disconnected: false,
     leftButtonPress: false,    
     player:{},
+    target:{},
     died: false,
     resize:false,    
     startPingTime: 0,
     toggleMassState: 0,
     backgroundColor: '#f2fbff',
     lineColor: '#00FF00',
+    borderColor:'#CCCCCC',
+    currentFrame:0,
+    framePerSec: 10,
+
 };

@@ -40,6 +40,8 @@ var player = {
 };
 global.player = player;
 
+console.log("From start size = "+global.screenWidth+":"+global.screenHeight);
+
 var foxes = [];
 var barriers = [];
 var users = [];
@@ -323,10 +325,26 @@ function resize() {
     if (!socket)
         return;           
  
+    player.screenWidth = c.width = global.screenWidth = 1000;
+    player.screenHeight = c.height = global.screenHeight = 600;
+
+    global.realWidth = window.innerWidth;
+    global.realHeight =  window.innerHeight;
+
+/*
     player.screenWidth = c.width = global.screenWidth = global.playerType == 'player' ? window.innerWidth : global.gameWidth;
     player.screenHeight = c.height = global.screenHeight = global.playerType == 'player' ? window.innerHeight : global.gameHeight;
+     let tX = global.playerType == 'player' ? window.innerWidth : global.gameWidth;
+     let tY = global.playerType == 'player' ? window.innerHeight : global.gameHeight;
       
-    console.log("new size "+player.screenWidth+" : "+player.screenHeight+ "  type = "+global.playerType);
- 
+    
+    console.log("c.width "+c.width+ "  c.height = "+c.height);
+    console.log("c.width "+c.width+ "  c.height = "+c.height);
+    console.log("global.screenWidth "+global.screenWidth+ "  global.screenHeight = "+global.screenHeight);
+    console.log("window.innerWidth "+window.innerWidth+ "  window.innerHeight = "+window.innerHeight);
+ 	console.log("tX "+tX+ "  tY = "+tY);
+ 	*/
+
+ 	console.log("new size "+player.screenWidth+" : "+player.screenHeight+ "  type = "+global.playerType);
     socket.emit('windowResized', { screenWidth: global.screenWidth, screenHeight: global.screenHeight });
 }

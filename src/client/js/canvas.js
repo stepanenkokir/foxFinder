@@ -19,6 +19,8 @@ class Canvas {
         this.cv.addEventListener('mousemove', this.gameInput, false);
         this.cv.addEventListener('mousedown', this.gameClick, false);
         this.cv.addEventListener('wheel', this.gameWheel, false);                                 
+        this.cv.addEventListener('touchstart', this.touchInput, false);      
+        this.cv.addEventListener('touchmove', this.touchInput, false);      
         //this.cv.addEventListener('blur', this.myBlur, false);
         this.cv.parent = self;
         global.canvas = this;  
@@ -29,8 +31,16 @@ class Canvas {
     gameInput(mouse) {  
         this.parent.target.x = global.target.x;        
         this.parent.target.y =global.target.y;        
-        this.parent.target.x1 = mouse.clientX - this.width / 2;
-        this.parent.target.y1 = mouse.clientY - this.height / 2;       
+        
+        //this.parent.target.x1 = mouse.clientX - this.width / 2;
+        //this.parent.target.y1 = mouse.clientY - this.height / 2;   
+
+        this.parent.target.x1 = mouse.clientX - global.realWidth / 2;
+        this.parent.target.y1 = mouse.clientY - global.realHeight / 2;   
+
+        //  let xx1 = mouse.clientX - global.realWidth / 2;
+        // let yy1 = mouse.clientY - global.realHeight / 2;   
+        //console.log("MOUSE: "+this.parent.target.x1+":"+this.parent.target.y1+" vs "+xx1+":"+yy1);    
         global.target = this.parent.target;  
         global.tecAngle = Math.atan2(this.parent.target.y1, this.parent.target.x1);            
         if(global.gameStart) global.canvas.socket.emit('0', global.target);       
@@ -83,7 +93,15 @@ class Canvas {
     }
 
     
+    touchInput(touch){
+        touch.preventDefault();
+        touch.stopPropagation();
+        if(!this.directionLock){
+          // this.parent.target.x = touch.touches[0].clientX - global.realWidth / 2;
 
+          console.log("TOUCH "+touch.touches[0].clientX+" : "+touch.touches[0].clientY);
+        }
+    }
     
 
     horizontal(key) {
