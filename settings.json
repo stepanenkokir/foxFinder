@@ -1,18 +1,19 @@
 {
     "port": 3000,	
     "startPositions":{
-	"x":3000,
-	"y":4000,
+	"x":500,
+	"y":500,
     "r":150},
-    "gameWidth": 10000,
-    "gameHeight": 10000,   
+    "gameWidth": 2000,
+    "gameHeight": 2000,   
     "maxRadius": 100,
     "minRadius": 2,
     "maxTrees": 5000, 
     "minAn" : 0.3,   
     "maxFoxes": 5,
-    "coeffTime":3,
+    "lengthOfCycleFox":20,
     "slowBase": 4.5,    
     "networkUpdateFactor": 40,
-    "maxHeartbeatInterval": 5000
+    "maxHeartbeatInterval": 5000,
+    "colorFoxes":["#FFFF00","#00FF00","#0000FF","#00FFFF","#FF00FF"]
 }

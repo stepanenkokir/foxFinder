@@ -22,6 +22,9 @@ var players = {};
 var playersInfo=[];
 var sockets={};
 
+var foxes=[];
+var trees = [];
+
 var session_store = new redisStorage({
       port: 6379,
       client: client,
@@ -99,7 +102,7 @@ io.on('connection', function(socket){
 
     
     socket.on('auth', function(nName){
-      //  console.log("Auth = "+nName);
+        console.log("Auth = "+nName);
         sessID = socket.request.session.id;
         players[sessID].name=nName;
         players[sessID].isLogin=true;
@@ -114,6 +117,12 @@ io.on('connection', function(socket){
 
     socket.on('startGame', function(){
         sessID = socket.request.session.id;
+        
+        if (!players[sessID].started)
+        {
+            players[sessID].startTime=Date.now();
+            players[sessID].currentFox = 0;   
+        }
         players[sessID].started = true;
         sockets[sessID] = socket;
         players[sessID].lastHeartbeat = new Date().getTime();
@@ -124,6 +133,11 @@ io.on('connection', function(socket){
         players[sessID].y=position.y;
         players[sessID].radius = 10;
         players[sessID].speed = 1;
+        players[sessID].step = 0;        
+        players[sessID].st = 0;  
+        players[sessID].foxInfo = {} ;
+
+        
 
         console.log("Start game for "+ players[sessID].name +" from "+sessID);        
 
@@ -138,7 +152,7 @@ io.on('connection', function(socket){
     socket.on('dscnct', function(){                
         disconnectSock(socket.request.session.id);
     });
-
+    
 
     socket.on('windowResized', function (data) {
        // console.log("Window resize!!");
@@ -165,9 +179,25 @@ function disconnectSock(sID){
 }
 
 setInterval(moveloop, 1000 / 60);
-setInterval(gameloop, 1000);
+setInterval(gameloop, 1000/10);
 setInterval(sendUpdates, 1000 / settings.networkUpdateFactor);
 
+
+function addFox(toAdd) {
+    var radius = {x:15, y:15};
+    while (toAdd--) {        
+        var position = util.randomPositionNonCollision(trees,foxes,radius,2);                           
+        foxes.push({
+            // Make IDs unique.
+            id: foxes.length,
+            x: position.x,
+            y: position.y,
+            radius: 15,            
+            hue: (foxes.length*360/settings.maxFoxes)
+        });
+        console.log("Fox "+foxes.length +" Pos = "+position.x+":"+position.y);
+    }   
+}
 
 function movePlayer(player) {
 
@@ -178,34 +208,17 @@ function movePlayer(player) {
         dir: player.target.direct,          
         shift: player.target.shift, 
     };   
-       
+
+
+    if (player.id.indexOf("00000")>=0){        
+        target = {
+            st: (util.randomInRange(0,8)),
+            dir: (util.randomInRange(0,359)*Math.PI/180),    
+            shift: false,
+        };
+    }       
     var newPlayer = {x:0, y:0}; 
 
-/*
-    var dist = Math.sqrt(Math.pow(target.y, 2) + Math.pow(target.x, 2));
-    var deg = Math.atan2(target.y, target.x);
-    if (deg<0)
-            deg+=2*Math.PI;
-    
-    var deg1 = Math.atan2((foxes[indexWorkingFox].y - player.y), (foxes[indexWorkingFox].x - player.x));
-    var dist1 = Math.sqrt(Math.pow((foxes[indexWorkingFox].y - player.y),2)+ Math.pow((foxes[indexWorkingFox].x - player.x),2));
-    if (player.finished)
-    {
-        deg1 = Math.atan2((settings.startPositions.y - player.y), (settings.startPositions.x - player.x));
-        dist1 = Math.sqrt(Math.pow((settings.startPositions.y - player.y),2)+ Math.pow((settings.startPositions.x - player.x),2));
-        if (dist1<settings.startPositions.r)
-            player.winner = true;
-    }
-        
-    
-   
-    if (deg1<0)
-            deg1+=2*Math.PI;
-    */
-    //var deg2 = Math.atan2(target.y1, target.x1);
-    //if (deg2<0)
-    //       deg2+=2*Math.PI;
-    
     var slowDown = 2;    
     var AlphaChannel = 0.02;
 /*
@@ -276,25 +289,23 @@ function movePlayer(player) {
 
     
 
-    /*
-    
-    if (target.x>0)    
-        dX = player.speed*step;        
-    if (target.x<0)    
-        dX = -player.speed*step;        
-    if (target.y>0)    
-        dY = player.speed*step;        
-    if (target.y<0)    
-        dY = -player.speed*step;        
-    
-    if (!isNaN(dY)) {
-       newPlayer.y =  player.y + dY;
-    }
-    if (!isNaN(dX)) {        
-        newPlayer.x =  player.x + dX;
-    }
-    */
+    if (dX!=0 || dY!=0)
+    {
+        dX+=Math.cos(target.dir)/slowDown;
+        dY+=Math.sin(target.dir)/slowDown;  
+        player.step+=1;  
+        if (player.step>=1000)
+            player.step=0;
 
+    }
+    else
+        player.step=0;  
+
+
+    let preAlf = 90+(target.dir/Math.PI*180);
+    if (preAlf<247.5)preAlf+=360;
+    player.st = Math.floor((preAlf-247.5)/45);   
+    
     newPlayer.x =  player.x + dX;
     newPlayer.y =  player.y + dY;
 
@@ -311,15 +322,50 @@ function movePlayer(player) {
     if (player.y < borderCalc) {
         newPlayer.y = borderCalc;
     }
+
+
+
+
+    var degToFox = Math.atan2((foxes[player.currentFox].y - player.y), (foxes[player.currentFox].x - player.x));
+    var distToFox = Math.sqrt(Math.pow((foxes[player.currentFox].y - player.y),2)+ Math.pow((foxes[player.currentFox].x - player.x),2));
+
+
+/*
+    var dist = Math.sqrt(Math.pow(target.y, 2) + Math.pow(target.x, 2));
+    var deg = Math.atan2(target.y, target.x);
+    if (deg<0)
+            deg+=2*Math.PI;
+    
+    var deg1 = Math.atan2((foxes[indexWorkingFox].y - player.y), (foxes[indexWorkingFox].x - player.x));
+    var dist1 = Math.sqrt(Math.pow((foxes[indexWorkingFox].y - player.y),2)+ Math.pow((foxes[indexWorkingFox].x - player.x),2));
+    if (player.finished)
+    {
+        deg1 = Math.atan2((settings.startPositions.y - player.y), (settings.startPositions.x - player.x));
+        dist1 = Math.sqrt(Math.pow((settings.startPositions.y - player.y),2)+ Math.pow((settings.startPositions.x - player.x),2));
+        if (dist1<settings.startPositions.r)
+            player.winner = true;
+    }
+        
+    
+   
+    if (deg1<0)
+            deg1+=2*Math.PI;
+    */
+    //var deg2 = Math.atan2(target.y1, target.x1);
+    //if (deg2<0)
+    //       deg2+=2*Math.PI;
+
+
+
+
  
    // if (player.x==newPlayer.x && player.y==newPlayer.y)
    //     return false;
    // if ((!util.collision(trees,newPlayer,1.02,prCol))||(player.godMode))
     {        
         player.x = newPlayer.x;
-        player.y = newPlayer.y;
-        player.direct = target.dir;
-        player.st = target.st;
+        player.y = newPlayer.y;       
+        player.foxInfo={angl:degToFox, dist:distToFox};
         player.alfa = AlphaChannel;
         player.nearZone = false;// (dist1<500);
     }   
@@ -364,8 +410,7 @@ function moveloop(){
     for (var sess in players)
     {    
         if (players[sess].started)
-        {
-
+        {            
             if(players[sess].lastHeartbeat < new Date().getTime() - settings.maxHeartbeatInterval) {
       
             sockets[sess].emit('kick', 
@@ -382,13 +427,13 @@ function moveloop(){
                     id: sess,                                        
                     x:players[sess].x,
                     y:players[sess].y,
-                    direct:players[sess].direct,
-                    st:players[sess].target.st,
+                    frame:{f1:players[sess].st, f2:players[sess].step},                    
                     alfa:players[sess].alfa,
                     nearZone:players[sess].nearZone,
+                    foxInfo:players[sess].foxInfo,
                 };
                 playersInfo.push(t_playersInfo);    
-             //  console.log("Move Players "+t_playersInfo.direct);         
+             //  console.log("Move Players  st = "+t_playersInfo.frame.f1+":"+t_playersInfo.frame.f2);         
             }                    
           cntPlayer++;  
         }
@@ -396,17 +441,33 @@ function moveloop(){
 }
 
 function gameloop(){
+
+    let nowTime = new Date().getTime();
+    for (var sess in players)
+    {
+         if (players[sess].started)
+        { 
+            let dTime=(nowTime - players[sess].startTime)/1000;
+            let indFox=Math.floor((dTime/ settings.lengthOfCycleFox)%settings.maxFoxes); 
+            players[sess].currentFox= indFox;
+
+            let indTimer=1-(dTime % settings.lengthOfCycleFox)/settings.lengthOfCycleFox; 
+            sockets[sess].emit("foxInfo",{id:indFox, clr: settings.colorFoxes[indFox], time:indTimer});
+
+          //   console.log(players[sess].id + " in game for "+ (nowTime - players[sess].startTime) + " = "+dTime+ "  == "+indTimer + " == "+indFox);
+        }
+    }
     
 }
 
 function sendUpdates(){
     if (playersInfo.length>0){
         for (var sess in players)
-            if (players[sess].started){
-
-                sockets[sess].emit("moveInfo",playersInfo);
+            if (players[sess].started){                
+                //if (sess.indexOf("00000")==-1)                  
+                 sockets[sess].emit("moveInfo",playersInfo);
             
-            // console.log("Send to "+sess+" == > "+sockets[sess]);
+         //   console.log("Send to "+sess+" == > "+sockets[sess]);
             // for (var vv in players[sess])
             // console.log(vv+"  =  "+players[sess][vv]);
         }
@@ -414,6 +475,8 @@ function sendUpdates(){
 }
 
 
+
+addFox(settings.maxFoxes);
 
 http.listen(PORT, () => {
     console.log('Сервер слушает порт '+PORT);

@@ -40,7 +40,7 @@ global.player = player;
 
 console.log("From start size = "+global.screenWidth+":"+global.screenHeight);
 
-var foxes = [];
+var foxes = {};
 var barriers = [];
 var users = [];
 var leaderboard = [];
@@ -115,28 +115,20 @@ function startGame(type) {
 	global.screenWidth = window.innerWidth;
     global.screenHeight = window.innerHeight;
     
-
-	
-   
      if (!global.animLoopHandle)
          animloop();
   
     window.canvas.socket = socket;
     global.socket = socket;
-    pelengs.splice(0);
-
+    //pelengs.splice(0);
     System.debug("Sizescreen !!= "+global.screenWidth+":"+global.screenHeight + " ==> "+player.x+":"+player.y);
 }
 
 
 function myDirectionDown(event)
 {
-
-    var key = event.which || event.keyCode;
-
-    console.log("Press Down!!! "+key);
+    var key = event.which || event.keyCode;    
     window.canvas.dddir(key);
-
 }
 
 function setupSocket(socket)
@@ -144,13 +136,7 @@ function setupSocket(socket)
 	socket.emit('firstConnect');
 
 	socket.on("contGame", function(serverData) {			
-		//document.getElementById("mainForm").appendChild(System.divInfo);
-		//document.getElementById("mainForm").appendChild(System.miniMap);
-		//document.getElementById("mainForm").appendChild(System.divStatus);
-    	//document.getElementById("spanStatus").innerHTML=serverData.name+" В игре!!";	
-    	//global.playerName = serverData.name;
 
-    
     	//System.writeCookie('name',global.playerName,12);
 
 		if (serverData.time<5)
@@ -194,6 +180,11 @@ function setupSocket(socket)
 			}
 		});
 	});
+
+    socket.on("foxInfo", function(foxInfo) {   
+        foxes=foxInfo;
+            
+    });
 
 
 
@@ -268,17 +259,15 @@ function gameLoop() {
 	 	if(global.gameStart) {					
 
     		graph.fillStyle = global.backgroundColor;
-    		graph.fillRect(0, 0, global.screenWidth, global.screenHeight);
-    	
-    		Graphics.drawgrid();  
-    	
-        	Graphics.drawPlayers(users);              
-                  
+    		graph.fillRect(0, 0, global.screenWidth, global.screenHeight);    	
+    		Graphics.drawgrid();      	
+        	Graphics.drawPlayers(users);   
+            Graphics.drawFoxStatus(foxes);                             
+
  		   	//foxes.forEach(drawFox);            
     		//barriers.forEach(drawBarriers);    
-    		//pelengs.forEach(drawPelengs);    	 	  
-    		//drawPlayers();
-                
+    		//pelengs.forEach(drawPelengs);    	 	              
+
     		socket.emit('0', window.canvas.target); // playerSendTarget "Heartbeat".
 		}
 	}
@@ -297,14 +286,6 @@ function disconnectFromServer(){
 	global.gameStart = false;
     global.died = true;
 
-	console.log(0);
-    document.getElementById("mainForm").removeChild(System.divInfo);
-    console.log(1);
-	document.getElementById("mainForm").removeChild(System.miniMap);
-	console.log(2);
-	document.getElementById("mainForm").removeChild(System.divStatus);
-	console.log(3);
-
     window.setTimeout(function() {
     	graph.fillStyle ='#000000';		
     	graph.fillRect(0, 0, global.screenWidth, global.screenHeight);
@@ -317,34 +298,23 @@ function disconnectFromServer(){
     }, 1000);
 }
 
-
-
-
 window.addEventListener('resize', resize);
 
 function resize() {     
     if (!socket)
         return;           
- 
-    player.screenWidth = c.width = global.screenWidth = 1000;
-    player.screenHeight = c.height = global.screenHeight = 600;
+    const koeffXY =  window.innerHeight/window.innerWidth;
+   // player.screenWidth = c.width = global.screenWidth = (global.userScreenWidth<window.innerWidth) ? global.userScreenWidth:window.innerWidth;
+    player.screenWidth = c.width = global.screenWidth = global.userScreenWidth;
+    let sizeY=player.screenWidth*koeffXY;
+   // player.screenHeight = c.height = global.screenHeight = (sizeY<window.innerHeight) ? sizeY:window.innerHeight;
+    player.screenHeight = c.height = global.screenHeight = sizeY;
 
     global.realWidth = window.innerWidth;
     global.realHeight =  window.innerHeight;
 
-/*
-    player.screenWidth = c.width = global.screenWidth = global.playerType == 'player' ? window.innerWidth : global.gameWidth;
-    player.screenHeight = c.height = global.screenHeight = global.playerType == 'player' ? window.innerHeight : global.gameHeight;
-     let tX = global.playerType == 'player' ? window.innerWidth : global.gameWidth;
-     let tY = global.playerType == 'player' ? window.innerHeight : global.gameHeight;
-      
-    
-    console.log("c.width "+c.width+ "  c.height = "+c.height);
-    console.log("c.width "+c.width+ "  c.height = "+c.height);
-    console.log("global.screenWidth "+global.screenWidth+ "  global.screenHeight = "+global.screenHeight);
-    console.log("window.innerWidth "+window.innerWidth+ "  window.innerHeight = "+window.innerHeight);
- 	console.log("tX "+tX+ "  tY = "+tY);
- 	*/
+    global.dpiX=c.width/window.innerWidth;
+    global.dpiY=c.height/window.innerHeight;
 
  	console.log("new size "+player.screenWidth+" : "+player.screenHeight+ "  type = "+global.playerType);
     socket.emit('windowResized', { screenWidth: global.screenWidth, screenHeight: global.screenHeight });

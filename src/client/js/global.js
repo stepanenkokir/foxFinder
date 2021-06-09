@@ -12,6 +12,8 @@ module.exports = {
     onShowPlayers:true,    
     
     // Canvas
+
+    userScreenWidth:1600,
     screenWidth: window.innerWidth,
     screenHeight: window.innerHeight,
 
@@ -37,10 +39,9 @@ module.exports = {
     resize:false,    
     startPingTime: 0,
     toggleMassState: 0,
-    backgroundColor: '#f2fbff',
-    lineColor: '#00FF00',
-    borderColor:'#CCCCCC',
-    currentFrame:0,
-    framePerSec: 10,
+    backgroundColor: '#fefefe',
+    lineColor: 'rgba(0,200,0,0.5)',
+    borderColor:'rgba(50,50,50,1)',
+    framePerSec: 5,
 
 };

@@ -28,9 +28,12 @@ exports.getDistance = function (p1, p2) {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2)) - p1.radius - p2.radius;
 };
 
-exports.randomInRange = function (from, to) {
+function randomInRange(from, to) {
     return Math.floor(Math.random() * (to - from)) + from;
-};
+}
+
+exports.randomInRange = randomInRange;
+
 
 // generate a random position within the field of play
 exports.randomPosition = function (radius) {
@@ -95,11 +98,30 @@ exports.randomPositionNonColl2 = function (bArr1, bArr2, radius, delta) {
     return { x:0, y:0 };
 };
 
+function checkCollisions(point, trees, foxes){
+
+    return false;
+}
+
+exports.randomPositionNonCollision = function (trees, foxes, radius, delta) {
+    var myPoint = { x:0, y:0 };
+    var prCol = true;
+
+    while (prCol){
+        myPoint.x = randomInRange(radius.x, cfg.gameWidth - radius.x);
+        myPoint.y = randomInRange(radius.y, cfg.gameHeight - radius.y); 
+        prCol = checkCollisions(myPoint, trees, foxes);
+
+    }
+
+    return myPoint;
+    
+};
 
 exports.startPosition = function (radius) {
     return {
-        x: exports.randomInRange(cfg.startPositions.x - radius, cfg.startPositions.x + radius),
-        y: exports.randomInRange(cfg.startPositions.y - radius, cfg.startPositions.y + radius)
+        x: randomInRange(cfg.startPositions.x - radius, cfg.startPositions.x + radius),
+        y: randomInRange(cfg.startPositions.y - radius, cfg.startPositions.y + radius)
     };
 };
 

@@ -34,10 +34,16 @@ class Canvas {
        // this.parent.target.y =global.target.y;        
         
         //this.parent.target.x1 = mouse.clientX - this.width / 2;
-        //this.parent.target.y1 = mouse.clientY - this.height / 2;   
+        //this.parent.target.y1 = mouse.clientY - this.height / 2;
 
-        let dx = mouse.clientX - global.realWidth / 2;
+        global.mouse = mouse;   
+
+        let dx = mouse.clientX - global.realWidth / 2;        
         let dy = mouse.clientY - global.realHeight / 2;   
+
+
+       // let dx = global.dpiX*mouse.clientX - global.screenWidth / 2;
+       // let dy = global.dpiY*mouse.clientY - global.screenHeight / 2;  
         
         global.tecAngle = Math.atan2(dy, dx);  
         this.parent.target.direct=global.tecAngle;
@@ -59,7 +65,7 @@ class Canvas {
                     // console.log ("Middle button is pressed");
                 break;
                 case 3:
-                //     console.log ("Right button is pressed");
+                //     console.log ("Right button is pressed");            
                      event.preventDefault();
                 break;
             }
@@ -179,7 +185,7 @@ class Canvas {
                 self.updateTarget(self.directions);
                 if (self.directions.length === 0) self.directionLock = false;
                 self.socket.emit('0', self.target);
-             //   console.log("UP "+ self.target.x+":"+self.target.y+ " | " + self.target.x1+":"+self.target.y1);
+             //   console.log("UP "+ self.target.x+":"+self.target.y+ " | " + self.target.x1+":"+self.w.y1);
             }
         }
     }
