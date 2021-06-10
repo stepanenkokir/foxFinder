@@ -15,8 +15,10 @@ var c = window.canvas.cv;
 var graph = c.getContext('2d');
 global.graphCtx = graph;
 
-var pelengs = [];
 var users= [];
+var listOfTrees=[];
+var listOfFoxes=[];
+
 
 var playerConfig = {
     border: 3,
@@ -137,15 +139,13 @@ function setupSocket(socket)
 
 	socket.on("contGame", function(serverData) {			
 
-    	//System.writeCookie('name',global.playerName,12);
-
+    	//System.writeCookie('name',global.playerName,12);       
 		if (serverData.time<5)
     		countDown(2);
     	else
     	{    	
     		startGame('player');    				
-    		socket.emit('startGame');
-    			
+    		socket.emit('startGame');    			
     	}
 	});
 
@@ -165,8 +165,10 @@ function setupSocket(socket)
 	});
 
 
-	socket.on("moveInfo", function(usersInfo) {	  
+	socket.on("moveInfo", function(usersInfo, listTrees, listFox) {	  
 		users=usersInfo;
+        listOfFoxes = listFox;
+        listOfTrees = listTrees;
 
 		users.forEach(function(u){			
 			if (u.id===global.id)
@@ -181,9 +183,14 @@ function setupSocket(socket)
 		});
 	});
 
-    socket.on("foxInfo", function(foxInfo) {   
+    socket.on("foxInfo", function(foxInfo, arrFox) {   
         foxes=foxInfo;
+        global.findFox=arrFox;
             
+    });
+
+    socket.on("findFox", function(info){
+        console.log("Find "+info.indx);       
     });
 
 
@@ -199,7 +206,7 @@ function setupSocket(socket)
 		Graphics.showMyText(info,{
         	color: "#FF0000",
         	font:'bold 30px sans-serif',
-        	x:global.screenWidth/2,
+        	x:50,
         	y:100,
         });
 	});
@@ -259,10 +266,20 @@ function gameLoop() {
 	 	if(global.gameStart) {					
 
     		graph.fillStyle = global.backgroundColor;
-    		graph.fillRect(0, 0, global.screenWidth, global.screenHeight);    	
+    		graph.fillRect(0, 0, global.screenWidth, global.screenHeight); 
+
+
+            
+
+
     		Graphics.drawgrid();      	
-        	Graphics.drawPlayers(users);   
-            Graphics.drawFoxStatus(foxes);                             
+            listOfFoxes.forEach(Graphics.drawFox);     
+        	Graphics.drawPlayers(users);            
+            Graphics.drawFoxStatus(foxes);  
+
+                  
+           // listOfTrees.forEach(Graphics.drawTrees);            
+           // pelengs.forEach(Graphics.drawPelengs);                           
 
  		   	//foxes.forEach(drawFox);            
     		//barriers.forEach(drawBarriers);    
@@ -316,6 +333,6 @@ function resize() {
     global.dpiX=c.width/window.innerWidth;
     global.dpiY=c.height/window.innerHeight;
 
- 	console.log("new size "+player.screenWidth+" : "+player.screenHeight+ "  type = "+global.playerType);
+ 	console.log("new size "+player.screenWidth+" : "+player.screenHeight);
     socket.emit('windowResized', { screenWidth: global.screenWidth, screenHeight: global.screenHeight });
 }

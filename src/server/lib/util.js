@@ -118,6 +118,9 @@ exports.randomPositionNonCollision = function (trees, foxes, radius, delta) {
     
 };
 
+
+
+
 exports.startPosition = function (radius) {
     return {
         x: randomInRange(cfg.startPositions.x - radius, cfg.startPositions.x + radius),

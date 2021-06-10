@@ -22,10 +22,10 @@ function authorizedForm()
 {	
 	let tHTML="<table id=\"tblMenu\">";
 	let	oldPlayerName="Player";
-	tHTML+="<tr><td>Ваше имя:</td><td colspan=3><input autofocus id=\"playerName\" type=\"text\" value=\""+oldPlayerName+"\" /></td></tr>";	
-	tHTML+="<tr><td colspan=4><button class=\"w100 h50\" id=\"btnStart\">Начать</button></td></tr>";
-	tHTML+="<tr><td colspan=2><button class=\"w100 h20\"id=\"btnLogin\">Войти</button></td>";
-	tHTML+="<td colspan=2><button class=\"w100 h20\" id=\"btnSignin\">Зарегистрироваться</button></td></tr>";
+	tHTML+="<tr><td>Ваше имя:</td><td><input autofocus id=\"playerName\" type=\"text\" value=\""+oldPlayerName+"\" /></td></tr>";	
+	tHTML+="<tr><td colspan=2><button class=\"w100 h50\" id=\"btnStart\">Просто побегать</button></td></tr>";
+	tHTML+="<tr><td colspan=2><button class=\"w100 h50\" id=\"btnLogin\">Войти</button></td></tr>";
+	tHTML+="<tr><td colspan=2><button class=\"w100 h50\" id=\"btnSignin\">Зарегистрироваться</button></td></tr>";
 	tHTML+="</table>";
 	return tHTML;
 }

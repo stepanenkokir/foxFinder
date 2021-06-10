@@ -46,6 +46,10 @@ class Canvas {
        // let dy = global.dpiY*mouse.clientY - global.screenHeight / 2;  
         
         global.tecAngle = Math.atan2(dy, dx);  
+
+        if (global.tecAngle<0)
+           global.tecAngle+=2*Math.PI;
+
         this.parent.target.direct=global.tecAngle;
         global.target = this.parent.target;          
         if(global.gameStart)    

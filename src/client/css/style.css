@@ -48,7 +48,7 @@ div{
 #authBox,#loginBox,#signinBox{	
 	position: relative;	
 	border: solid 0.2vw #dcdc00; 
-	width:40vw;
+	width:20vw;
     height:10vw;
     right: 1mm;
 	font-size: 3vh;
@@ -69,9 +69,9 @@ div{
 }
 
 #playerName,#playerMail,#playerPasswd,#playerPasswd2{
-    width:25vw;
+    width:12vw;
     height: 3vh;
-    font-size: 2vh;
+    font-size: 4vh;
     
 }
 
@@ -118,12 +118,18 @@ div{
     font-size: 2vh;	
 }
 
+.w50{
+  width:50%;
+    height: 2vh;
+    font-size: 2vh; 
+}
+
 .h50{
     height: 5vh;
 }
 
 .h20{
-    height: 3vh;
+    height: 4vh;
     margin: auto;
 }
 
@@ -136,7 +142,7 @@ div{
 
 #tblMenu{
     height: 9vh;
-    width: 35vw;
+    width: 100%;
     text-align: right;
 }
 #tblMenu tr, td{
