@@ -193,7 +193,8 @@ function addFox(toAdd) {
     var radius = {x:15, y:15};
     while (toAdd--) {        
         var position = util.randomPositionNonCollision(trees,foxes,radius,2);   
-                        
+              position.x=100+toAdd*200;             
+              position.y=100+toAdd*200;             
         foxes.push({
             // Make IDs unique.
             id: foxes.length,
@@ -386,8 +387,16 @@ function tickPlayer(currentPlayer) {
 //        sockets[currentPlayer.id].emit('serverSendPlayerChatLocal', { sender: currentPlayer.name, message: "Я на финише! Мое время: "+currentPlayer.timeTotal+" секунд"});    
         currentPlayer.winner = false; 
         currentPlayer.finished = false; 
+        console.log("WINNER");
+
         sockets[currentPlayer.id].emit('WIN',{time:timeTotal});
-    }              
+        sockets[currentPlayer.id].emit('kick', 
+            '"ПОБЕДА! Этот этап пройден!');
+        disconnectSock(currentPlayer.id);
+        return false;
+    } 
+
+    return true;             
 }
 
 function moveloop(){    
@@ -404,18 +413,21 @@ function moveloop(){
                 continue;
             }
     
-            var ch = tickPlayer(players[sess]);       
-            let t_playersInfo={
-                id: sess,                                        
-                x:players[sess].x,
-                y:players[sess].y,
-                frame:{f1:players[sess].st, f2:players[sess].step},                    
-                alfa:players[sess].alfa,
-                nearZone:players[sess].nearZone,
-                foxInfo:players[sess].foxInfo,
-            };
-            playersInfo.push(t_playersInfo);    
+            var ch = tickPlayer(players[sess]); 
+            if (ch)
+            {      
+                let t_playersInfo={
+                    id: sess,                                        
+                    x:players[sess].x,
+                    y:players[sess].y,
+                    frame:{f1:players[sess].st, f2:players[sess].step},                    
+                    alfa:players[sess].alfa,
+                    nearZone:players[sess].nearZone,
+                    foxInfo:players[sess].foxInfo,
+                };
+                playersInfo.push(t_playersInfo);    
              //  console.log("Move Players  st = "+t_playersInfo.frame.f1+":"+t_playersInfo.frame.f2);                                               
+            }
         }
     }        
 }

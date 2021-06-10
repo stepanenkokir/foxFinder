@@ -193,6 +193,10 @@ function setupSocket(socket)
         console.log("Find "+info.indx);       
     });
 
+    socket.on("WIN", function(info){
+        console.log("WIN!!!!");       
+    });
+
 
 
 	socket.on("kick", function(info) {	  
