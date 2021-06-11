@@ -74,7 +74,7 @@ function drawMiniMap(){
 
 function timeInStr(time){
     let hh = "0"+Math.floor(time/3600);
-    let mm = "0"+Math.floor(time/60);
+    let mm = "0"+Math.floor(time/60)%60;
     //let ss = time - (3600*hh + 60*mm);
     let ss = "0"+(time%60).toFixed(1);
 
@@ -191,7 +191,10 @@ function drawPlayers(users) {
             //пеленг
 
             global.graphCtx.strokeStyle = 'hsl(' + global.indexFox*72 + ', 100%, 45%)';
-            global.graphCtx.fillStyle = 'hsla(' + global.indexFox*72 + ', 100%, 50%,'+users[z].alfa+')';
+            if (global.toFinish)
+                global.graphCtx.fillStyle = 'rgba(10,10,10,'+users[z].alfa+')';
+            else
+                global.graphCtx.fillStyle = 'hsla(' + global.indexFox*72 + ', 100%, 50%,'+users[z].alfa+')';
             global.graphCtx.lineWidth = 0.01;
     
             global.graphCtx.beginPath();
@@ -219,9 +222,9 @@ function drawPlayers(users) {
             global.graphCtx.stroke();
             global.graphCtx.fill();
 
-            if (global.leftButtonPress)
+            if (global.leftButtonPress && !global.toFinishw &&  global.findFox[global.indexFox]===0)
             {
-                global.leftButtonPress = false;                
+                global.leftButtonPress = false;                            
                 global.pelengs.push({ 
                     id:global.indexFox, 
                     alfa:users[z].alfa,
@@ -273,6 +276,12 @@ function drawFox(foxes){
 
 function drawTrees(trees){
 
+    global.graphCtx.strokeStyle = 'hsla(' + trees.stroke + ', 100%, 50%, 0.1)';
+    global.graphCtx.fillStyle = 'hsla(' + trees.fill + ', 100%, 50%, 0.1)'; 
+    global.graphCtx.lineWidth = trees.strokeWidth;
+    drawEllipse(trees.x - global.player.x + global.screenWidth / 2 +10,
+               trees.y - global.player.y + global.screenHeight / 2 + 10,
+               trees.radiusX,trees.radiusY, 25);   
 }
 
 function drawPelengs(peleng){

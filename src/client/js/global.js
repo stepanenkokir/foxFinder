@@ -33,6 +33,7 @@ module.exports = {
     indexID:-1,
     indexFox:-1,
     gameStart: false,
+    toFinish:false,
     disconnected: false,
     leftButtonPress: false,    
     player:{},

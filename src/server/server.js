@@ -161,9 +161,10 @@ io.on('connection', function(socket){
     
 
     socket.on('windowResized', function (data) {
+        sessID = socket.request.session.id;
        // console.log("Window resize!!");
-       // currentPlayer.screenWidth = data.screenWidth;
-       // currentPlayer.screenHeight = data.screenHeight;
+        players[sessID].screenWidth = data.screenWidth;
+        players[sessID].screenHeight = data.screenHeight;
     });
 
    // Heartbeat function, update everytime.
@@ -193,8 +194,8 @@ function addFox(toAdd) {
     var radius = {x:15, y:15};
     while (toAdd--) {        
         var position = util.randomPositionNonCollision(trees,foxes,radius,2);   
-              position.x=100+toAdd*200;             
-              position.y=100+toAdd*200;             
+          //    position.x=100+toAdd*200;             
+          //    position.y=100+toAdd*200;             
         foxes.push({
             // Make IDs unique.
             id: foxes.length,
@@ -207,6 +208,36 @@ function addFox(toAdd) {
     }   
 }
 
+function addTrees(toAdd) {
+    //start Positions
+    trees.push({
+            id: -1,
+            x: settings.startPositions.x,
+            y: settings.startPositions.y,
+            radiusX: settings.startPositions.r,
+            radiusY: settings.startPositions.r,           
+            fill: 0,
+            stroke:  1,
+            strokeWidth: 2
+        }); 
+        
+    while (toAdd--) {                                 
+        var radius = util.randomRadius(settings.minRadius, settings.maxRadius);        
+        var position = util.randomPositionNonColl(trees,radius,1.1); 
+        trees.push({
+            id: trees.length,
+            x: position.x,
+            y: position.y,
+            radiusX: radius.x,
+            radiusY: radius.y,           
+            fill: Math.round(Math.random() * 360),
+            stroke:  Math.round(Math.random() * 360),
+            strokeWidth: Math.round(Math.random() * 10)
+        });
+    }    
+    console.log("Add Trees = "+trees.length);   
+    
+}
 
 function testWIN(player)
 { 
@@ -243,46 +274,15 @@ function movePlayer(player) {
     
     var newPlayer = {x:0, y:0}; 
     var slowDown = 2;    
-    var step = (target.shift)?3:1;   
+    var step = (target.shift)?2:1;   
     var dX=0 ,dY= 0;    
+   
+    if (target.st>0)
+    {   
+        dY = player.speed*step*((target.st-1)%4>0?1:0)*Math.pow(-1,(1-Math.floor((target.st-1)/4)));
+        dX = player.speed*step*((target.st+1)%4>0?1:0)*Math.pow(-1,(1-Math.floor((target.st+1)/4)));
+    }
     
-    if (target.st==1){                
-        dX = -player.speed*step;        
-    }
-
-    if (target.st==2){        
-        dY = -player.speed*step;        
-        dX = -player.speed*step;        
-    }
-
-    if (target.st==3)    
-        dY = -player.speed*step;        
-    
-    if (target.st==4){        
-        dY = -player.speed*step;        
-        dX = player.speed*step;        
-    }
-
-    if (target.st==5){                
-        dX = player.speed*step;        
-    }
-
-    if (target.st==6){        
-        dY = player.speed*step;        
-        dX = player.speed*step;        
-    }
-
-    if (target.st==7){        
-        dY = player.speed*step;                
-    }
-
-    if (target.st==8){        
-        dY = player.speed*step;        
-        dX = -player.speed*step;        
-    }
-
-    
-
     if (dX!=0 || dY!=0)
     {
         dX+=Math.cos(target.dir)/slowDown;
@@ -290,7 +290,6 @@ function movePlayer(player) {
         player.step+=1;  
         if (player.step>=1000)
             player.step=0;
-
     }
     else
         player.step=0;  
@@ -351,7 +350,7 @@ function movePlayer(player) {
         //testWin
 
 
-   // if ((!util.collision(trees,newPlayer,1.02,prCol))||(player.godMode))
+    if ((!util.collision(trees,newPlayer,1.02,prCol))||(player.godMode))
     {        
         player.x = newPlayer.x;
         player.y = newPlayer.y;       
@@ -457,15 +456,24 @@ function sendUpdates(){
 
         for (var sess in players)
             if (players[sess].started){                
-
-                const curPl = players[sess];
-
-                var visibleFox = foxes.map(function (f){
-                    if (curPl.findFox[f.id]>0)
+                const u = players[sess];            
+                var visibleFox = foxes.map(function (f){                                                        
+                    if (( f.x+f.radius > u.x - u.screenWidth/2 - 20 &&
+                    f.x-f.radius < u.x + u.screenWidth/2 + 20 &&
+                    f.y+f.radius > u.y  - u.screenHeight/2 - 20 &&
+                    f.y-f.radius < u.y  + u.screenHeight/2 + 20)&&
+                    (u.findFox[f.id]>0))
                         return f;
                 }).filter(function(f) { return f; });
 
-                var visibleTrees = {};
+                var visibleTrees = trees.map(function (f){
+                    if ( f.x+f.radiusX > u.x - u.screenWidth/2 - 20 &&
+                    f.x-f.radiusX < u.x + u.screenWidth/2 + 20 &&
+                    f.y+f.radiusY > u.y - u.screenHeight/2 - 20 &&
+                    f.y-f.radiusY < u.y + u.screenHeight/2 + 20) {
+                    return f;
+                }
+                }).filter(function(f) {return f;});
                 
                 sockets[sess].emit("moveInfo",playersInfo, visibleTrees, visibleFox);
                      
@@ -474,6 +482,7 @@ function sendUpdates(){
 }
 
 addFox(settings.maxFoxes);
+addTrees(settings.maxTrees);
 
 http.listen(PORT, () => {
     console.log('Сервер слушает порт '+PORT);

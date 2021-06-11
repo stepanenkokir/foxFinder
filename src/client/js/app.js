@@ -161,6 +161,7 @@ function setupSocket(socket)
         global.id = data.id;  	
     	console.log("CRD : "+data.positions.x+":"+data.positions.y);
     	resize();
+        global.toFinish=false;
     		
 	});
 
@@ -169,6 +170,8 @@ function setupSocket(socket)
 		users=usersInfo;
         listOfFoxes = listFox;
         listOfTrees = listTrees;
+
+      //  console.log("Info about Players:"+usersInfo.length+" Foxes:"+listFox.length+" Trees: "+listTrees.length);
 
 		users.forEach(function(u){			
 			if (u.id===global.id)
@@ -184,17 +187,21 @@ function setupSocket(socket)
 	});
 
     socket.on("foxInfo", function(foxInfo, arrFox) {   
-        foxes=foxInfo;
+        foxes=foxInfo;        
         global.findFox=arrFox;
             
     });
 
     socket.on("findFox", function(info){
-        console.log("Find "+info.indx);       
+        console.log("Find "+info.indx);  
+        deletePelengs(info.indx);
+        if (info.indx===999)
+            global.toFinish=true;     
     });
 
     socket.on("WIN", function(info){
-        console.log("WIN!!!!");       
+        console.log("WIN!!!!"); 
+        global.toFinish=false;           
     });
 
 
@@ -214,6 +221,18 @@ function setupSocket(socket)
         	y:100,
         });
 	});
+
+}
+
+function deletePelengs(indx){
+    console.log("OLD pelengs " + global.pelengs.length);
+    var tp = global.pelengs.filter(function(p){
+        if (p.id!=indx)
+            return p;
+    });    
+    global.pelengs = tp;
+
+    console.log("New pelengs " + global.pelengs.length);
 
 }
 
@@ -277,9 +296,11 @@ function gameLoop() {
 
 
     		Graphics.drawgrid();      	
-            listOfFoxes.forEach(Graphics.drawFox);     
+            listOfFoxes.forEach(Graphics.drawFox); 
+            listOfTrees.forEach(Graphics.drawTrees);            
         	Graphics.drawPlayers(users);            
             Graphics.drawFoxStatus(foxes);  
+            
 
                   
            // listOfTrees.forEach(Graphics.drawTrees);            

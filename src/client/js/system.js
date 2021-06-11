@@ -33,9 +33,10 @@ function authorizedForm()
 function loginForm()
 {	
 	let tHTML="<table id=\"tblMenu\">";
-	tHTML+="<tr><td>Ваше имя:</td><td><input autofocus id=\"playerName\" type=\"text\" /></td></tr>";	
+//	tHTML+="<tr><td>Ваше имя:</td><td><input autofocus id=\"playerName\" type=\"text\" /></td></tr>";	
 	tHTML+="<tr><td>E-mail:</td><td><input id=\"playerMail\" type=\"text\" /></td></tr>";		
 	tHTML+="<tr><td>Пароль:</td><td><input id=\"playerPasswd\" type=\"password\" /></td></tr>";		
+	tHTML+="<tr><td>Запомнить:</td><td align=left><input id=\"saveMeOnThis\" type=\"checkbox\" /></td></tr>";		
 	tHTML+="<tr><td colspan=2><button class=\"w100 h20\" id=\"btnStart\">Начать</button></td></tr>";		
 	tHTML+="</table>";
 	return tHTML;

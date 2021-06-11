@@ -99,8 +99,24 @@ exports.randomPositionNonColl2 = function (bArr1, bArr2, radius, delta) {
 };
 
 function checkCollisions(point, trees, foxes){
+    var i, RES;
+    for (i=1;i<trees.length;i++)
+    {        
+        RES = (Math.pow((point.x - trees[i].x),2) / Math.pow((trees[i].radiusX),2)) + 
+                  (Math.pow((point.y - trees[i].y),2) / Math.pow((trees[i].radiusY),2));
+        if (RES<50)        
+            return true;
+    }    
 
-    return false;
+    for (i=0;i<foxes.length;i++)
+    {        
+        RES = Math.sqrt(Math.pow((point.x - foxes[i].x),2) +Math.pow((point.y - foxes[i].y),2));
+        if (RES<1000)        
+            return true;
+    }    
+
+
+    return false;   
 }
 
 exports.randomPositionNonCollision = function (trees, foxes, radius, delta) {
