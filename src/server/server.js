@@ -274,7 +274,7 @@ function movePlayer(player) {
     
     var newPlayer = {x:0, y:0}; 
     var slowDown = 2;    
-    var step = (target.shift)?2:1;   
+    var step = (target.shift)?2:1;  
     var dX=0 ,dY= 0;    
    
     if (target.st>0)
@@ -357,7 +357,8 @@ function movePlayer(player) {
         player.foxInfo={angl:degToFox, dist:distToFox};
         player.alfa = AlphaChannel;
         player.nearZone = distToFox<500;
-    }       
+    }    
+       
     return true;
 }
 

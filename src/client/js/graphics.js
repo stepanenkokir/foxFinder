@@ -243,6 +243,8 @@ function drawWalkMen( direction,  frame, x,y) {
     global.graphCtx.drawImage(walker, 
                  frame*128, direction*128, 128, 128,
                  x,y,100,100    );
+    global.mainX = x;
+    global.mainY = y;
 }
 
 function drawEllipse(centerX, centerY, radiusX, radiusY, sides) {
@@ -258,9 +260,20 @@ function drawEllipse(centerX, centerY, radiusX, radiusY, sides) {
         global.graphCtx.lineTo(x, y);
     }
 
+    const ddX = (centerX - global.mainX )/20;
+    const ddY = (centerY - global.mainY )/20;
+    global.graphCtx.shadowColor = "#777777";
+    global.graphCtx.shadowBlur = 40;
+    global.graphCtx.shadowOffsetX = ddX;
+    global.graphCtx.shadowOffsetY = ddY;
     global.graphCtx.closePath();
     global.graphCtx.stroke();
     global.graphCtx.fill();
+
+    global.graphCtx.shadowColor = "#000000";
+    global.graphCtx.shadowBlur = 0;
+    global.graphCtx.shadowOffsetX = 0;
+    global.graphCtx.shadowOffsetY = 0;
 }
 
 function drawFox(foxes){
@@ -276,9 +289,9 @@ function drawFox(foxes){
 
 function drawTrees(trees){
 
-    global.graphCtx.strokeStyle = 'hsla(' + trees.stroke + ', 100%, 50%, 0.1)';
-    global.graphCtx.fillStyle = 'hsla(' + trees.fill + ', 100%, 50%, 0.1)'; 
-    global.graphCtx.lineWidth = trees.strokeWidth;
+    global.graphCtx.strokeStyle = 'hsla(' + trees.stroke + ', 100%, 50%, 0.5)';
+    global.graphCtx.fillStyle = 'hsla(' + trees.fill + ', 100%, 50%, 1)'; 
+    global.graphCtx.lineWidth = 0.01;//trees.strokeWidth;
     drawEllipse(trees.x - global.player.x + global.screenWidth / 2 +10,
                trees.y - global.player.y + global.screenHeight / 2 + 10,
                trees.radiusX,trees.radiusY, 25);   

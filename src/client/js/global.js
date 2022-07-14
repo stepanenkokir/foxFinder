@@ -46,5 +46,7 @@ module.exports = {
     lineColor: 'rgba(0,200,0,0.5)',
     borderColor:'rgba(50,50,50,1)',
     framePerSec: 5,
+    mainX:0,
+    mainY:0,
 
 };
